@@ -11,8 +11,8 @@ xmin = 0;
 xmax = 32*10^-3;
 ymin = 0;
 ymax = 32*10^-3;
-zmin = 0.3*63.2*10^-3; % Don't capture the pressure field inside the transducer array
-zmax = 1.7*63.2*10^-3;
+zmin = 0*63.2*10^-3; % Don't capture the pressure field inside the transducer array
+zmax = 1.2*63.2*10^-3;
 
 dx = 0.2e-3;
 dy = dx;
@@ -32,7 +32,7 @@ medium.powerlawexponent=2; %http://iopscience.iop.org/article/10.1088/0031-9155/
 pistonPts = 200;
 RhoMax = 1;
 dSigFD = 0.0025;
-NHARM = 15; % Number of Harmonics
+NHARM = 10; % Number of Harmonics
 Exflag = 0; % no effect
 
 % Perform the calculation
