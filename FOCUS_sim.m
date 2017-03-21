@@ -11,8 +11,8 @@ xmin = 0;
 xmax = 32*10^-3;
 ymin = 0;
 ymax = 32*10^-3;
-zmin = 0*63.2*10^-3; % Don't capture the pressure field inside the transducer array
-zmax = 1.2*63.2*10^-3;
+zmin = 0.4*63.2*10^-3; % Don't capture the pressure field inside the transducer array
+zmax = 1.6*63.2*10^-3;
 
 dx = 0.2e-3;
 dy = dx;
@@ -49,7 +49,7 @@ fprintf('KZK finished in %f seconds\n', t_kzk2);
 figure;
 title('First Harmonic');
 %mesh(z,x,squeeze(abs(P(:,1,:))));
-mesh(z,x,squeeze(abs(pkzk_cw(:,1,:,10))));
+mesh(z,x,squeeze(abs(pkzk_cw(:,1,:,8))));
 xlabel('axial distance (m)')
 ylabel('radial distance (m)')
 
