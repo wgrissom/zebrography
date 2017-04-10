@@ -146,3 +146,21 @@ combcmd = ['/usr/local/bin/sshpass -p ' piPW ' ssh pi@' piIP ' ' displaycmd];
                end
         end
        
+%% generate hex w/ diff spacings
+    %%% change rectangle size below %%%
+     width=3; %pixels
+     leng=3; %pixels
+     for gap = 6:15
+        img1 = ones(1200,1920);
+        rows=floor(1200/gap);
+        cols=floor(1920/gap);
+        for i=0:2:rows-1
+            for j=0:2:cols-1
+                img1(i*gap+1:i*gap+leng,j*gap+1:j*gap+width)=0;
+            end
+        end
+        filename = sprintf('gap%d.png', gap);
+        imwrite(img1, filename);
+     end
+
+  

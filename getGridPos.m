@@ -1,12 +1,12 @@
 disp 'Loading images'
 % load the displayed image
-img_disp = imread('hex1.png');
+img_disp = imread('gap6.png');
 % get the fraction of dark pixels, for setting a threshold below
 pinFrac = sum(img_disp(:) == 0)/numel(img_disp);
 
 
 % load the measured image
-img_meas = imread('IMG_0064.CR2');
+img_meas = imread('IMG_0016.CR2');
 img_meas = mean(img_meas(50:3800, 150:end, :),3); % crop black edges, combine color channels
 
 % crop it to middle

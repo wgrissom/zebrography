@@ -90,7 +90,7 @@ fprintf(fncngen,'OUTP1:POL NORM');
     %pause(3);
     
 %% 
-new_message=' hex1';
+new_message=' gap12';
 fprintf(1, 'Writing %d bytes\n', length(new_message));
 d_output_stream.writeBytes(char(new_message));
 d_output_stream.flush;
