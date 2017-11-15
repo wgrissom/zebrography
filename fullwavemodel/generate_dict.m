@@ -37,7 +37,7 @@ for i = 2:length(z_sv)-1
 end
 for i = 1:length(z_sv)-2
     for j = 1:size(dPdz,3)
-    projdic(:,j,i) = (ifft(ifftshift(G * col(squeeze(dPdz(:,:,j,i+1))))));
+    projdic(:,:,j,i) = reshape((ifft(ifftshift(G * col(squeeze(dPdz(:,:,j,i+1)))))),[size(P,1),length(angles)]);
 %     [xS,info] = qpwls_pcg(0*mask(:),G,1,col(I(:,j,i)),0,0,1,25,mask(:));
 
 %     I = ifft((reshape(I,length(angles),nX)),1);
@@ -101,4 +101,8 @@ end
 % end
 
  hisdic = his(:,:,:);
+ hisdic = premute(hisdic,[3 1 2]);
+ hisdic = hisdic(:,:)';
+ projdic = permute(projdic,[2 3 1 4]);
+ projdic = projdic(:,:,:);
 % hisdic = permute(hisdic,[3 1 2]);
