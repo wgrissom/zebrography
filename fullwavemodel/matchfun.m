@@ -5,4 +5,4 @@ hisColl = permute(hisdic,[3 1 2]);
 hisColl = hisColl(:,:)';
 hasPressure = sqrt(sum((hisColl - repmat(col(his),[1 size(hisColl,2)])).^2,1));
 num = find(hasPressure == min(hasPressure));
-proj = squeeze(projdic(:,:,num));
+proj = squeeze(projdic(:,:,num(1)));

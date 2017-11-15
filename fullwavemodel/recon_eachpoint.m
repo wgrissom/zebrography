@@ -7,7 +7,7 @@ nx = (size(proj,2));
 kk = -1:2/(nx-1):1;
 kk = [kron(cosd(angles(:)),kk.') kron(sind(angles(:)),kk.')];
 G = Gmri(kk,true(nx),'fov',nx/2);
-I = fftshift(fft(squeeze(col(proj))));
+I = fftshift(fft(squeeze(col(proj'))));
 I = I.*abs(kk(:,1)+1i*kk(:,2));
 drk = real(reshape(G'*I,[nx,nx])/(nx*nx));
                                                                                                                                      
