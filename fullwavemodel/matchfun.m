@@ -1,4 +1,4 @@
-function [num,proj] = matchfun(his,hisdic,projdic)
+function proj = matchfun(his,hisdic,projdic)
 % hisdic: historgrams in dictionaries nx*ny*number of historgrams
 % projdic: projected waveforms
 hisColl = permute(hisdic,[3 1 2]);
