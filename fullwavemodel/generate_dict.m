@@ -101,7 +101,4 @@ end
 % end
 
  hisdic = his(:,:,:);
- hisdic = premute(hisdic,[3 1 2]);
- hisdic = hisdic(:,:)';
- projdic = projdic(:,:);
 % hisdic = permute(hisdic,[3 1 2]);
