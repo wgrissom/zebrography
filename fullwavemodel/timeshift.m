@@ -1,3 +1,4 @@
+% try to use iterations to decrease influences of time delays. It's still being modified...
 % projnew(:,:,:,1) = projoritim;
 % projprenew(:,:,:,1) = projpretim;
 % plot(squeeze(projnew(2,:,71,1))','-');
