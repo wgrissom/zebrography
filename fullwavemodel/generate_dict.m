@@ -9,17 +9,18 @@ Zd = 0.05;
 dn0dp = (1.3475-1.3325)/((1100-1)*100000); % dindex/dPascal, from Waxler paper, read from Figure 2 at 24.8 deg CSS
 %%
 P = [];
-tt = 553:573;
+% tt = 715:745;
+tt = 1681:1723;
 Pori = apaz_shifted(:,:,tt,:);
 for ii = 1:size(Pori,4)
-    P(:,:,:,ii) = permute(interp1(tTarg(tt),permute(squeeze(Pori(:,:,:,ii)),[3 2 1 ]),tTarg(tt(1)):dT/100:tTarg(tt(end)),'spline',0),[3 2 1]);
-    %     apaz_shifted(:,:,ii) = interp1((t+tShift(ii))',squeeze(apaz_sv(:,:,ii))',tTarg','spline');%,0);
-    
+    P(:,:,:,ii) = permute(interp1(tTarg(tt),permute(squeeze(Pori(:,:,:,ii)),[3 2 1 ]),tTarg(tt(1)):dT/100:tTarg(tt(end)),'cubic',0),[3 2 1]);%   apaz_shifted(:,:,ii) = interp1((t+tShift(ii))',squeeze(apaz_sv(:,:,ii))',tTarg','spline');%,0);
 end
+[x,y] = findpeaks(squeeze(P(71,71,:,4)));
+P = P(:,:,y(1):y(end)-1,:);
 % P = Pori;
 %% project pressure waveforms
 % calculate the projections using Gmri
-angles = 0:3:179;
+angles = 0:179;
 kk = -1:2/(size(P,1)-1):1;
 kk = [kron(cosd(angles(:)),kk.') kron(sind(angles(:)),kk.')];
 G = Gmri(kk,true(size(P,1)),'fov',size(P,1)/2);
@@ -74,15 +75,14 @@ for i = 1:size(locx,1)
             x = round(yyy+1+locx(i,kk,j)); z = round(xxx+1+locz(i,kk,j));
             histmp(x,z)=histmp(x,z)+1;
         end
-%         if length(find(histmp ~=0)) == 1
-%             his(:,:,i,j) = zeros(hissize,hissize);
-%             his(round(hissize/2),round(hissize/2)) = 1;
-%         else
+        if length(find(histmp ~=0)) == 1
+            his(:,:,i,j) = zeros(hissize,hissize);
+            his(round(hissize/2),round(hissize/2),i,j) = 1;
+        else
             tmp = imresize(histmp/size(locz,2),[hissize,hissize]);
-            tmp(tmp<1e-10) = 0;
-
+            tmp(tmp<0) = 0;
             his(:,:,i,j) = tmp/sum(tmp(:));
-%         end
+        end
         histmp = zeros(2*yyy+1,2*xxx+1);
     end
 end

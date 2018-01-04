@@ -1,4 +1,4 @@
-cfunction [apaz_sv,z_sv,t,dT,nX,nY] = launch_asr_adaptive(p0,num,a,f0,c0)
+function [apaz_sv,z_sv,t,dT,nX,nY] = launch_asr_adaptive(p0,num,a,f0,c0)
 omega0=2*pi*f0;
 lambda=c0/f0; % wavelength
 dX=lambda/num; dY=lambda/num;% grid spacing
@@ -10,8 +10,9 @@ if(mod(nY,2)-1)
     nY=nY+1;
 end
 %  dZ=dX*5;
- dZ = dX/2; % WAG quarter z-steps
-dT=dX/5/c0; %2*pi/omega0/20;
+dZ = dX/2; % WAG quarter z-steps
+% dT=dX/30/c0; %2*pi/omega0/20;
+dT=dX/20/c0; %2*pi/omega0/20;
 k=omega0/c0;
 beta=8; % nonlinear coefficient
 rho0=1000; % equilibrium density
@@ -45,19 +46,19 @@ end
 
 t = (0:nT-1)*dT-2*ncycles/omega0*2*pi;
 nSamples = round(ncycles/f0/dT);
-hannWind = blackman(2*round(nSamples/4)).';
+hannWind = blackman(2*round(nSamples/2000)).';
 window = [hannWind(1:length(hannWind)/2) ones(1,nSamples-length(hannWind)) ...
     hannWind(length(hannWind)/2+1:end)];
 icvec = sin(t*omega0)*p0;
 tWindow = (0:length(window)-1)*dT;
 window = interp1(tWindow - mean(tWindow),window,t,'spline',0);
 icvec = icvec.*window;
-%icvec = exp(-(1.05*t*omega0/(ncycles*pi)).^(2*dur)).*sin(t*omega0)*p0;
+% icvec = exp(-(1.05*t*omega0/(ncycles*pi)).^(2*dur)).*sin(t*omega0)*p0;
 %icvec = 1 ./ (1 + exp((abs(t) - ncycles/f0) ./ (10*ncycles/f0/128))) .*sin(t*omega0)*p0;
 
 foc=2*a;
 %
-[i,j] = meshgrid(1:size(ap,1),1:size(ap,2));
+  [i,j] = meshgrid(1:size(ap,1),1:size(ap,2));
 ix = i*dX - size(ap,1)/2*dX;
 jy = j*dY - size(ap,2)/2*dY;
 tt = sqrt(ix.^2+jy.^2+foc^2)/c0-(foc/c0);
@@ -65,7 +66,7 @@ tArray = permute(repmat(t(:),[1 size(ap)]),[2 3 1]) - repmat(tt,[1 1 nT]);
  ttWindow = permute(repmat(window(:),[1 size(ap)]),[2 3 1]) - repmat(tt,[1 1 nT]);
 icvec = sin(tArray*omega0)*p0;
 icvec = icvec.*ttWindow;
-% icvec = exp(-(1.05*(tArray)*omega0/(ncycles*pi)).^(2*dur)).*sin((tArray)*omega0)*p0;
+%  icvec = exp(-(1.05*(tArray)*omega0/(ncycles*pi)).^(2*dur)).*sin((tArray)*omega0)*p0;
 % icvec = 1 ./ (1 + exp((abs(tArray) - ncycles/f0) ./ (10*ncycles/f0/128))) .*sin((tArray)*omega0)*p0;
 apa = icvec.*repmat(ap,[1 1 nT]);
 apa=flipdim(apa,3);
@@ -79,6 +80,7 @@ alpha0=2.17e-3; % dB/MHz^2/cm for water, note attenuation law proportional to f^
 [afilt3d] = precalculate_ad(alpha0,nX,nY,nT,dZ,dT);
 
 %% MARCH ALONG PROPAGATION AXIS %%
+flag = 0;
 apaz=apa; zvec=dZ; dZa=dZ; cc=1;
 kkk =1;
 apaz_sv = [];
@@ -86,21 +88,24 @@ z_sv = [];
 while(sum(zvec)<1.5*foc)
     dZa=dZ;
     %N*dZ/dT*max(max(max(apaz)))
-    if(N*dZa/dT*max(max(max(apaz)))>0.1/4) % WAG quarter z-steps
+    if(N*dZa/dT*max(max(max(apaz)))>0.1) % WAG quarter z-steps
     %if(N*dZ/dT*max(max(max(apaz)))>0.1)
         %dZa=0.1*dT/max(max(max(apaz)))/N;
-        dZa=0.1/4*dT/max(max(max(apaz)))/N; % WAG quarter z-steps
+        dZa=0.1*dT/max(max(max(apaz)))/N; % WAG quarter z-steps
     end
     zvec(cc)=dZa;
     disp(['Propagation distance = ' num2str(sum(zvec)) ' m'])
     disp(['Current z-step = ' num2str(dZa) ' m'])
 %     
     apaz=march_asr(apaz,dZa,dT,N,HH,abl,afilt3d); 
-     if abs(sum(zvec(:))-foc) < 20*dZ
+     if abs(sum(zvec(:))-foc) < 15*dZ %6
 %     if abs(zvec(cc)-foc) < 4*dZ
         apaz_sv(:,:,:,kkk) = apaz(1:end,1:end,:); % the x/y/time profile at current z-coordinate
         z_sv(kkk) = sum(zvec); % the current z-coordinate
         kkk = kkk+1;
+        flag = 1;
+     elseif flag == 1
+        break;
      end
 %     if length(z_sv)>1 && abs(sum(zvec(:))-foc) > 5*dZ
 %         break;
