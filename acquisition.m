@@ -1,7 +1,8 @@
-close all; clc;
-clear all
-IPaddress='10.114.29.34'; 
-amplitude=200; 
+useNexus = false;
+
+%% Nexus password is zebra
+IPaddress='10.114.17.94'; % IP of function generator 
+amplitude=100; 
 total_reps=10; %number of repetitions of "on" (and "off") images that are averaged
 hornSchunck=false; %whether or not to execute HS method
 
@@ -28,7 +29,7 @@ if exist(str) ~= 7
     mkdir(str)
 end
 
-%% TCP/IP connection
+%% TCP/IP connection for function generator
 % Create TCP/IP object 'fncngen'. Specify server machine and port number. 
 fncngen = tcpip(IPaddress, 5025,'NetworkRole','Client'); 
 
@@ -71,7 +72,8 @@ fprintf(fncngen,'OUTP1 OFF;');
 fprintf(fncngen,'OUTP1:LOAD 50.0');
 fprintf(fncngen,'OUTP1:POL NORM');
 
-%% Create server (run by "evaluate selection")
+%% Create server to control tablet (run by "evaluate selection")
+if useNexus
     import java.net.ServerSocket
     import java.io.*
 
@@ -94,21 +96,25 @@ new_message=' gap12';
 fprintf(1, 'Writing %d bytes\n', length(new_message));
 d_output_stream.writeBytes(char(new_message));
 d_output_stream.flush;
-fprintf(fncngen,'OUTP1 OFF;');
 %TAKE A PICTURE!!!
+end % if useNexus
 
 %% 
+fprintf(fncngen,'OUTP1 OFF;');
 import java.awt.Robot;
 import java.awt.event.*;
-mouse = Robot;
-screenSize = get(0, 'screensize');
+mouse = Robot; % set up mouse click control of camera shutter
+%screenSize = get(0, 'screensize');
 
-for ii=1:32
-    new_message=sprintf(' hex%d',ii);
-    fprintf(1, 'Writing %d bytes\n', length(new_message));
-    d_output_stream.writeBytes(char(new_message));
-    pause(5);
-
+for ii=1:1
+    if useNexus
+        new_message=sprintf(' hex%d',ii);
+        fprintf(1, 'Writing %d bytes\n', length(new_message));
+        d_output_stream.writeBytes(char(new_message));
+        
+    end
+    pause(5); %give user time to put mouse on exposure button
+    
     mouse.mousePress(InputEvent.BUTTON1_MASK);
     mouse.mouseRelease(InputEvent.BUTTON1_MASK);
     pause(2);
@@ -121,8 +127,8 @@ for ii=1:32
     fprintf(fncngen,'OUTP1 OFF;');
 end
 %% Close port
-server_socket.close;
-output_socket.close;
+% server_socket.close;
+% output_socket.close;
 
 %% Rename pictures
 % Get all PDF files in the current folder
