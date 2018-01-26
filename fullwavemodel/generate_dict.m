@@ -62,8 +62,8 @@ flag2 = dz<0;
 for i = 2:size(proj,4)-1
     tmpdz = dz(:,:,:,i);
     tmplocz = locz(:,:,:,i);
-    tmplocz(flag1(:,:,:,i)) = tmpdz(flag1(:,:,:,i))/(z_sv(i+1)-z_sv(i));
-    tmplocz(flag2(:,:,:,i)) = tmpdz(flag2(:,:,:,i))/(z_sv(i)-z_sv(i-1));
+    tmplocz(flag1(:,:,:,i)) = tmpdz(flag1(:,:,:,i))/((z_sv(i+1)-z_sv(i)));
+    tmplocz(flag2(:,:,:,i)) = tmpdz(flag2(:,:,:,i))/((z_sv(i)-z_sv(i-1)));
 %     locz(dz>0) = dz(dz>0)/(z_sv(i+1)-z_sv(i));
 %     locz(dz<0) = dz(dz<0)/(z_sv(i)-z_sv(i-1));
     locz(:,:,:,i) = tmplocz;
@@ -83,12 +83,18 @@ yyy = xxx;
 hissize = 15;
 his = zeros(hissize,hissize,size(locx,1), size(locx,3));
 histmp = zeros(2*yyy+1,2*xxx+1);
-for i = 1:size(locx,1)
+for i = 1
+    tic
     for j = 1:size(locx,3)
-        for kk = 1:size(locx,2)
-            x = round(yyy+1+locx(i,kk,j)); z = round(xxx+1+locz(i,kk,j));
-            histmp(x,z)=histmp(x,z)+1;
-        end
+%         for kk = 1:size(locx,2)
+%             x = round(yyy+1+locx(i,kk,j)); z = round(xxx+1+locz(i,kk,j));
+%             histmp(x,z)=histmp(x,z)+1;
+%         end
+        x = squeeze(round(yyy+1+locx(i,:,j)));
+        z = squeeze(round(xxx+1+locz(i,:,j)));
+        tmp = zeros(2*yyy+1,2*xxx+1,size(locx,2));
+        tmp(x(:),z(:),1:size(locx,2)) = 1;
+        histmp = sum(tmp,3);
         if length(find(histmp ~=0)) == 1
             his(:,:,i,j) = zeros(hissize,hissize);
             his(round(hissize/2),round(hissize/2),i,j) = 1;
@@ -99,7 +105,18 @@ for i = 1:size(locx,1)
         end
         histmp = zeros(2*yyy+1,2*xxx+1);
     end
+    toc
 end
+
+%%his = squeeze(his(:,:,1,:));
+% his = reshape(his,15,15,75,60);
+% size(his)
+% ghis = zeros(size(his,3)*hissize,size(his,4)*hissize);
+% for i = 1:75
+% for j = 1:60
+% ghis(hissize*(i-1)+1:hissize*i,hissize*(j-1)+1:hissize*j) = his(:,:,i,j);
+% end
+% end
 
 %%
 % ghis = zeros(size(his,3)*hissize,size(his,4)*hissize);
