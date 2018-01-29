@@ -12,7 +12,8 @@ dn0dp = (1.3475-1.3325)/((1100-1)*100000); % dindex/dPascal, from Waxler paper, 
 P = [];
 % tt = 715:745;
 % tt = 1681:1723;
-tt = 635:653;
+% tt = 635:653;
+tt = 386:398;
  Pori = apaz_shifted(:,:,tt,:);
 % P = Pori;
 for ii = 1:size(Pori,4)
@@ -76,33 +77,33 @@ locz = permute(locz,[2 3 1 4]);
 locz = locz(:,:,:);
 
 %%
-xxx = round(max(abs(locz(:))));
-yyy = round(max(abs(locx(:))));
-xxx = max(xxx,yyy);
-yyy = xxx;
+normxz =  max(max(abs(locx(:)),max(abs(locz(:)))));
 hissize = 15;
+half = floor(hissize/2);
 his = zeros(hissize,hissize,size(locx,1), size(locx,3));
-histmp = zeros(2*yyy+1,2*xxx+1);
+histmp = zeros(hissize,hissize);
+locx = squeeze(locx/normxz*half);
+locz = squeeze(locz/normxz*half);
 for i = 1
     tic
     for j = 1:size(locx,3)
-%         for kk = 1:size(locx,2)
-%             x = round(yyy+1+locx(i,kk,j)); z = round(xxx+1+locz(i,kk,j));
-%             histmp(x,z)=histmp(x,z)+1;
-%         end
-        x = squeeze(round(yyy+1+locx(i,:,j)));
-        z = squeeze(round(xxx+1+locz(i,:,j)));
-        tmp = zeros(2*yyy+1,2*xxx+1,size(locx,2));
-        tmp(x(:),z(:),1:size(locx,2)) = 1;
-        histmp = sum(tmp,3);
-        if length(find(histmp ~=0)) == 1
-            his(:,:,i,j) = zeros(hissize,hissize);
-            his(round(hissize/2),round(hissize/2),i,j) = 1;
-        else
-            tmp = imresize(histmp/size(locz,2),[hissize,hissize]);
-            tmp(tmp<0) = 0;
-            his(:,:,i,j) = tmp/sum(tmp(:));
+        for kk = 1:size(locx,2)
+            x = round(half+1+locx(i,kk,j)); z = round(half+1+locz(i,kk,j));
+            histmp(x,z)=histmp(x,z)+1/nt;
         end
+%         x = squeeze(round(yyy+1+locx(i,:,j)));
+%         z = squeeze(round(xxx+1+locz(i,:,j)));
+%         tmp = zeros(2*yyy+1,2*xxx+1,size(locx,2));
+%         tmp(x(:),z(:),1:size(locx,2)) = 1;
+%         histmp = sum(tmp,3);
+%         if length(find(histmp ~=0)) == 1
+%             his(:,:,i,j) = zeros(hissize,hissize);
+%             his(round(hissize/2),round(hissize/2),i,j) = 1;
+% %         else
+%             tmp = imresize(histmp/size(locz,2),[hissize,hissize]);
+%             tmp(tmp<0) = 0;
+        his(:,:,i,j) = histemp;
+%         end
         histmp = zeros(2*yyy+1,2*xxx+1);
     end
     toc
