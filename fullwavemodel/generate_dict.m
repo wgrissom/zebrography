@@ -78,12 +78,12 @@ locz = locz(:,:,:);
 
 %%
 normxz =  max(max(abs(locx(:)),max(abs(locz(:)))));
-hissize = 15;
+hissize = 11;
 half = floor(hissize/2);
 his = zeros(hissize,hissize,size(locx,1), size(locx,3));
 histmp = zeros(hissize,hissize);
-locx = squeeze(locx/normxz*half);
-locz = squeeze(locz/normxz*half);
+locx = squeeze(locx/normxz*hissize/2);
+locz = squeeze(locz/normxz*hissize/2);
 for i = 1
     tic
     for j = 1:size(locx,3)
