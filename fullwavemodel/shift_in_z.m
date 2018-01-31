@@ -17,7 +17,7 @@ apaz_sv(isnan(apaz_sv)) = 0;
 %%
 apaz_shifted = [];
 for ii = 1:size(apaz_sv,4)
-     apaz_shifted(:,:,:,ii) = permute(interp1((t+tShift(ii))',permute(squeeze(apaz_sv(:,:,:,ii)),[3 2 1 ]),tTarg','spline',0),[3 2 1]);
+     apaz_shifted(:,:,:,ii) = permute(interp1((t+tShift(ii))',permute(squeeze(apaz_sv(:,:,:,ii)),[3 2 1 ]),tTarg','pchip',0),[3 2 1]);
 %     apaz_shifted(:,:,ii) = interp1((t+tShift(ii))',squeeze(apaz_sv(:,:,ii))',tTarg','spline');%,0);
     
 end
