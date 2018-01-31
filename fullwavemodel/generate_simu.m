@@ -14,12 +14,13 @@ P = [];
 % tt = 715:745;
 % tt = 1681:1723;
 % tt = 635:653;
-tt = 387:397;  %newdata
+% tt = 387:397;  %newdata
+tt = 443:457; %latestdata
 % tt = 290:302;
  Pori = apaz_shifted(:,:,tt,:);
 % P = Pori;
 for ii = 1:size(Pori,4)
-    P(:,:,:,ii) = permute(interp1(tTarg(tt),permute(squeeze(Pori(:,:,:,ii)),[3 2 1]),tTarg(tt(1)):dT/10:tTarg(tt(end)),'PCHIP',0),[3 2 1]);%   apaz_shifted(:,:,ii) = interp1((t+tShift(ii))',squeeze(apaz_sv(:,:,ii))',tTarg','spline');%,0);
+    P(:,:,:,ii) = permute(interp1(tTarg(tt),permute(squeeze(Pori(:,:,:,ii)),[3 2 1]),tTarg(tt(1)):dT/50:tTarg(tt(end)),'PCHIP',0),[3 2 1]);%   apaz_shifted(:,:,ii) = interp1((t+tShift(ii))',squeeze(apaz_sv(:,:,ii))',tTarg','spline');%,0);
 end
 [x,y] = findpeaks(squeeze(P(round(size(P,1)/2),round(size(P,1)/2),:,num)));
 P = P(:,:,y(1):y(end)-1,:);
@@ -84,8 +85,8 @@ locz = permute(locz,[2 3 1 4]);
 %%
 dgrid = 92.6/98*1e-3; %m
 numz = length(z_sv);
-numx = 139;
-np = 21;
+numx = size(apaz_shifted,1);
+np = 11;
 nphalf = floor(np/2);
 img = zeros(numx*np,numz*np);
 % img(np*((1:numx))-np+1,np*((1:numz))-np+1) = 1;
@@ -109,7 +110,6 @@ for i = 2:numx
         img((i*np-np+1-nphalf):(i*np-np+1+nphalf),(j*np-np+1-nphalf):(j*np-np+1+nphalf)) = histmp;
     end
 end
-img = 1-img;
 
 % for i = 2:2:numz
 %     for j = 2:2:numx
