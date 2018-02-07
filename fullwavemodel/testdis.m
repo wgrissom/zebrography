@@ -3,7 +3,22 @@ z_sv = cumsum(zvec);
 z_sv = z_sv(abs(z_sv-foc) < 0.25*foc);
 num = find(abs(z_sv-foc) == min(abs(z_sv-foc)));
 tTarg = (round((0.5*foc)/c0/dT):round((2*foc)/c0/dT)-1)*dT;
-apaz_shifted = shift_in_z(reshape(apaz,[587 1 nT 116]),z_sv,tTarg,t,c0);
+
+%% shift in z
+apaz = reshape(apaz,[587,1,2881,116]);
+zPos = z_sv;
+tShift = zPos/c0; % time shifts (position/(m/s) = s)
+apaz(isnan(apaz)) = 0;
+
+%%
+apaz_shifted = [];
+for ii = 1:size(apaz,4)
+     apaz_shifted(:,:,:,ii) = permute(interp1((t+tShift(ii))',permute((apaz(:,:,:,ii)),[3 2 1 ]),tTarg','spline',0),[3 2 1]);
+%     apaz_shifted(:,:,ii) = interp1((t+tShift(ii))',squeeze(apaz_sv(:,:,ii))',tTarg','spline');%,0);
+    
+end
+
+%%
 n0 = 1.3325; % base index of refraction
 % m, distance from center of US focus to background
 Zd = 0.05;
