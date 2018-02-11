@@ -107,18 +107,21 @@ zdisloc = round(repmat(reshape(zzz,size(zzz,1),1,size(zzz,2)),1,nt,1)+loczz);
 
 %%
 
-img = imread('./2018_02_09/IMG_0023.CR2');
+img = imread('./2018_02_09/IMG_0015.CR2');
 histmp = zeros(size(xdisloc,1),size(xdisloc,3),3);
 partimg = double(img(1+1026:length(xloc)+1026,1+2386+43:length(zloc)+2386+43,:));
 for ii = 1:nt
     ind = sub2ind([size(xdisloc,1),size(zdisloc,3)],squeeze(xdisloc(:,ii,:)),squeeze(zdisloc(:,ii,:)));
     for jj = 1:3
-        tmp = partimg(:,:,jj);
-        histmp(:,:,jj)= histmp(:,:,jj) + double(tmp(ind));
+        tmp = squeeze(partimg(:,:,jj));
+%         tmp = partimg(:,:,jj);
+%         histmp(:,:,jj)= histmp(:,:,jj) + double(tmp(ind));
+        tmp(ind) = squeeze(partimg(:,:,jj));
+        histmp(:,:,jj) = histmp(:,:,jj) + tmp;
     end
 end
 bkg = img;
 bkg(1+1026:length(xloc)+1026,1+2386+43:length(zloc)+2386+43,:) = round(histmp/nt);
 
 figure; imshow(uint8(round(bkg(:,1+2386+43:length(zloc)+2386+43,:))));
-saveas(gcf,'./simuing/simuimg_0023.jpg');   
+% saveas(gcf,'./simuing/simuimg_0023.jpg');   
