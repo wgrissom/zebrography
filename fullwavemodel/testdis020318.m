@@ -101,7 +101,7 @@ for kk = 1:nt
 %            bkg((1:nn1)+(ii-1)*nn1,(1:nn2)+(jj-1)*nn2,:) = 0;
            indx = round((1:nn1)+(ii-1)*nn1+locx(ii,kk,jj)); % apply displacements and get the shifted locations
            indz = round((1:nn2)+(jj-1)*nn2+locz(ii,kk,jj));
-%            [tz,tx] = meshgrid(indz,indx);  
+           [tz,tx] = meshgrid(indz,indx);  
            indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
            ttimes = reshape(tab(indind(:),2),nn1,nn2);   
 %            block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
