@@ -86,13 +86,13 @@ img = imread('./2018_02_09/IMG_0019.CR2');
 partimg = double(img(1+273:length(xloc)+273,1+1781:length(zloc)+1781,:));
 nX = size(locx,1); nZ = size(locx,3);
 nt = size(locx,2);
-nn1 = round(dX/ds); 
+nn1 = round(dX/ds);
 nn2 = round(dZ/ds); 
 histmp = [];
 img = zeros(size(bkg));
 for kk = 1:nt
     ind = sub2ind([size(xdisloc,1),size(zdisloc,3)],squeeze(xdisloc(:,kk,:)),squeeze(zdisloc(:,kk,:)));
-    tab = tabulate(ind(:)); % find how many pixels move to the same location 
+%     tab = tabulate(ind(:)); % find how many pixels move to the same location 
     bkg = double(partimg)/nt;
     img = zeros(size(bkg));
     for ii = 1:nX
@@ -101,12 +101,12 @@ for kk = 1:nt
 %            bkg((1:nn1)+(ii-1)*nn1,(1:nn2)+(jj-1)*nn2,:) = 0;
            indx = round((1:nn1)+(ii-1)*nn1+locx(ii,kk,jj)); % apply displacements and get the shifted locations
            indz = round((1:nn2)+(jj-1)*nn2+locz(ii,kk,jj));
-           [tz,tx] = meshgrid(indz,indx);  
+%            [tz,tx] = meshgrid(indz,indx);  
            indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
-           ttimes = reshape(tab(indind(:),2),nn1,nn2);   
-           block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
-           ttimes(ttimes == 0) = 1;
-           block = block./repmat(ttimes,1,1,3); 
+%            ttimes = reshape(tab(indind(:),2),nn1,nn2);   
+%            block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
+%            ttimes(ttimes == 0) = 1;
+%            block = block./repmat(ttimes,1,1,3); 
            %if ttimes>1 divide it by times to get the sum of pixels which
            %are shifted to the same location 
            img(indx,indz,:) = img(indx,indz,:)+block;
