@@ -92,7 +92,7 @@ histmp = [];
 img = zeros(size(bkg));
 for kk = 1:nt
     ind = sub2ind([size(xdisloc,1),size(zdisloc,3)],squeeze(xdisloc(:,kk,:)),squeeze(zdisloc(:,kk,:)));
-%     tab = tabulate(ind(:)); % find how many pixels move to the same location 
+    tab = tabulate(ind(:)); % find how many pixels move to the same location 
     bkg = double(partimg)/nt;
     img = zeros(size(bkg));
     for ii = 1:nX
@@ -103,13 +103,13 @@ for kk = 1:nt
            indz = round((1:nn2)+(jj-1)*nn2+locz(ii,kk,jj));
 %            [tz,tx] = meshgrid(indz,indx);  
            indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
-%            ttimes = reshape(tab(indind(:),2),nn1,nn2);   
+           ttimes = reshape(tab(indind(:),2),nn1,nn2);   
 %            block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
-%            ttimes(ttimes == 0) = 1;
+           ttimes(ttimes == 0) = 1;
 %            block = block./repmat(ttimes,1,1,3); 
            %if ttimes>1 divide it by times to get the sum of pixels which
            %are shifted to the same location 
-           img(indx,indz,:) = img(indx,indz,:)+block;
+           img(indx,indz,:) = img(indx,indz,:)+block./ttimes;
        end
     end
     histmp(:,:,:,kk) = img;%bkg;
