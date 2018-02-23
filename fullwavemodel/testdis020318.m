@@ -71,21 +71,45 @@ for i = 1+n/2:size(proj,1)-1-n/2
 end
 
 %% for real img
-ds = 3e-3/16/7;
+ds = 3e-3/16/6;
 
 locx = (squeeze(round(dx/(ds))));
 locz = (squeeze(round(dz/(ds))));
 
-locx = flip(locx,3);   %displacements for locations
-locz = -flip(locz,3);
-
+locxd = flip(locx,3);   %displacements for locations
+loczd = -flip(locz,3);
+% locxd = 1.2*locx;
+% loczd = 1.2*locz;
+nz = size(loczd,3);
+nt = size(loczd,2);
+nn1 = round(dX/ds);
+nn2 = round(dZ/ds); 
+xloc = kron(ones(nn1,1),1:587);
+zloc = kron(ones(nn2,1),1:nz);
+xloc = xloc(:);
+zloc = zloc(:);
+[zo,xo] = meshgrid(1:nz,1:587);
+[zz,xx] = meshgrid(zloc,xloc);
+% [xo,zo] = meshgrid(1:587,1:nz);
+% [xx,zz] = meshgrid(xloc,zloc);
+locxx =[];
+loczz = [];
+for ii = 1:nt
+    locxx(:,ii,:) = interp2(zo,xo,squeeze(locxd(:,ii,:)),zz,xx);
+    loczz(:,ii,:) = interp2(zo,xo,squeeze(loczd(:,ii,:)),zz,xx);
+end
+% locxx = flip(locxx,3);
+[zzz,xxx] = meshgrid(1:length(zloc),1:length(xloc));
+xdisloc = round(repmat(reshape(xxx,size(xxx,1),1,size(xxx,2)),1,nt,1)+locxx);
+zdisloc = round(repmat(reshape(zzz,size(zzz,1),1,size(zzz,2)),1,nt,1)+loczz);
+%caculate coordinates for each pixel at each time point
 
 
 %%
 img = imread('./2018_02_09/IMG_0019.CR2');
 partimg = double(img(1+273:length(xloc)+273,1+1781:length(zloc)+1781,:));
-nX = size(locx,1); nZ = size(locx,3);
-nt = size(locx,2);
+nX = size(locxd,1); nZ = size(locxd,3);
+nt = size(locxd,2);
 nn1 = round(dX/ds);
 nn2 = round(dZ/ds); 
 histmp = [];
@@ -99,17 +123,16 @@ for kk = 1:nt
        for jj = 1:nZ
            block = bkg((1:nn1)+(ii-1)*nn1,(1:nn2)+(jj-1)*nn2,:); % block with the same displacements
 %            bkg((1:nn1)+(ii-1)*nn1,(1:nn2)+(jj-1)*nn2,:) = 0;
-           indx = round((1:nn1)+(ii-1)*nn1+locx(ii,kk,jj)); % apply displacements and get the shifted locations
-           indz = round((1:nn2)+(jj-1)*nn2+locz(ii,kk,jj));
+           indx = round((1:nn1)+(ii-1)*nn1+locxd(ii,kk,jj)); % apply displacements and get the shifted locations
+           indz = round((1:nn2)+(jj-1)*nn2+loczd(ii,kk,jj));
            [tz,tx] = meshgrid(indz,indx);  
            indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
            ttimes = reshape(tab(indind(:),2),nn1,nn2);   
 %            block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
-           ttimes(ttimes == 0) = 1;
 %            block = block./repmat(ttimes,1,1,3); 
            %if ttimes>1 divide it by times to get the sum of pixels which
            %are shifted to the same location 
-           img(indx,indz,:) = img(indx,indz,:)+(block./repmat(ttimes,1,1,3));
+           img(indx,indz,:) = img(indx,indz,:)+(block./ttimes);%,1,1,3));
        end
     end
     histmp(:,:,:,kk) = img;%bkg;
