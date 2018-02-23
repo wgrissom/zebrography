@@ -109,7 +109,7 @@ for kk = 1:nt
 %            block = block./repmat(ttimes,1,1,3); 
            %if ttimes>1 divide it by times to get the sum of pixels which
            %are shifted to the same location 
-           img(indx,indz,:) = img(indx,indz,:)+block./ttimes;
+           img(indx,indz,:) = img(indx,indz,:)+(block./repmat(ttimes,1,1,3));
        end
     end
     histmp(:,:,:,kk) = img;%bkg;
