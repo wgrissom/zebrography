@@ -128,11 +128,14 @@ for kk = 1:nt
            [tz,tx] = meshgrid(indz,indx);  
            indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
            ttimes = reshape(tab(indind(:),2),nn1,nn2);   
+           if sum(ttimes==0,1)
+               a = 0;
+           end
 %            block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
 %            block = block./repmat(ttimes,1,1,3); 
            %if ttimes>1 divide it by times to get the sum of pixels which
            %are shifted to the same location 
-           img(indx,indz,:) = img(indx,indz,:)+(block./ttimes);%,1,1,3));
+           img(indx,indz,:) = img(indx,indz,:)+block; %./ttimes);%,1,1,3));
        end
     end
     histmp(:,:,:,kk) = img;%bkg;
