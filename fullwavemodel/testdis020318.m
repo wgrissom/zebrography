@@ -86,9 +86,8 @@ img = imread('./2018_02_09/IMG_0019.CR2');
 partimg = double(img(1+273:length(xloc)+273,1+1781:length(zloc)+1781,:));
 nX = size(locx,1); nZ = size(locx,3);
 nt = size(locx,2);
-nn1 = round(dX/ds); n1half = floor(nn1/2);
-nn2 = round(dZ/ds); n2half = floor(nn2/2);
-bkg = double(partimg)/nt;
+nn1 = round(dX/ds); 
+nn2 = round(dZ/ds); 
 histmp = [];
 img = zeros(size(bkg));
 for kk = 1:nt
