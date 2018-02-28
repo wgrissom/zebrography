@@ -71,7 +71,7 @@ for i = 1+n/2:size(proj,1)-1-n/2
 end
 
 %% for real img
-ds = 3e-3/16/6;
+ds = 3e-3/16/8;
 
 locx = (squeeze(round(dx/(ds))));
 locz = (squeeze(round(dz/(ds))));
@@ -104,7 +104,6 @@ xdisloc = round(repmat(reshape(xxx,size(xxx,1),1,size(xxx,2)),1,nt,1)+locxx);
 zdisloc = round(repmat(reshape(zzz,size(zzz,1),1,size(zzz,2)),1,nt,1)+loczz);
 %caculate coordinates for each pixel at each time point
 
-
 %%
 img = imread('./2018_02_09/IMG_0019.CR2');
 partimg = double(img(1+273:length(xloc)+273,1+1781:length(zloc)+1781,:));
@@ -114,10 +113,13 @@ nn1 = round(dX/ds);
 nn2 = round(dZ/ds); 
 histmp = [];
 img = zeros(size(bkg));
+tmp = zeros(size(xdisloc,1),size(zdisloc,3));
 for kk = 1:nt
     ind = sub2ind([size(xdisloc,1),size(zdisloc,3)],squeeze(xdisloc(:,kk,:)),squeeze(zdisloc(:,kk,:)));
-%     tab = tabulate(ind(:)); % find how many pixels move to the same location 
-    bkg = double(partimg)/nt;
+    tab = tabulate(ind(:)); % find how many pixels move to the same location 
+    times = tab(:,2);
+    tmp = tmp + reshape((times==0),size(xdisloc,1),size(zdisloc,3));
+    bkg = double(partimg);
     img = zeros(size(bkg));
     for ii = 1:nX
        for jj = 1:nZ
@@ -125,17 +127,18 @@ for kk = 1:nt
 %            bkg((1:nn1)+(ii-1)*nn1,(1:nn2)+(jj-1)*nn2,:) = 0;
            indx = round((1:nn1)+(ii-1)*nn1+locxd(ii,kk,jj)); % apply displacements and get the shifted locations
            indz = round((1:nn2)+(jj-1)*nn2+loczd(ii,kk,jj));
-%            [tz,tx] = meshgrid(indz,indx);  
-%            indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
-%            ttimes = reshape(tab(indind(:),2),nn1,nn2);   
+           [tz,tx] = meshgrid(indz,indx);  
+           indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
+           ttimes = reshape(tab(indind(:),2),nn1,nn2);   
 %            block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
 %            block = block./repmat(ttimes,1,1,3); 
            %if ttimes>1 divide it by times to get the sum of pixels which
            %are shifted to the same location 
-           img(indx,indz,:) = img(indx,indz,:)+block;%;./ttimes);%,1,1,3));
+           img(indx,indz,:) = img(indx,indz,:)+block./repmat(ttimes,1,1,3);
        end
     end
     histmp(:,:,:,kk) = img;%bkg;
 end
-histmp = sum(histmp,4);
-imshow(uint8(histmp))
+tmp = nt - tmp;
+imshow(uint8(sum(histmp,4)./tmp));
+saveas(gcf,'./simuimg_00190227.jpg');
