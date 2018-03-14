@@ -1,8 +1,9 @@
-%adaptive_results_020918.mat
-z_sv = cumsum(zvec);
-ind = find(abs(z_sv-foc) < 0.5*foc);
-apaz = apaz_sv(:,:,ind);
-z_sv = z_sv(ind);
+% %adaptive_results_020918.mat
+% z_sv = cumsum(zvec);
+% ind = find(abs(z_sv-foc) < 0.5*foc);
+apaz = apaz_sv;
+nX = size(apaz,1);
+% z_sv = z_sv(ind);
 %% shift in z
 nT = size(apaz_sv,2);
 apaz = reshape(apaz,[587,1,nT,size(apaz,3)]);
@@ -12,10 +13,13 @@ apaz(isnan(apaz)) = 0;
 clear apaz_sv
 apaz = squeeze(apaz);
 %%
-apaz(:,2882:5000,:) = 0;
+apaz(:,size(apaz,2)+1:5000,:) = 0;
 
 %%
-z_svnew = [flip(z_sv(97):-dZ:z_sv(1)),z_sv(97)+dZ:dZ:z_sv(end)];
+sig = squeeze(max(max(apaz,[],2),[],1));
+nn = find(sig == max(sig));
+display(nn);
+z_svnew = [flip(z_sv(nn):-dZ:z_sv(1)),z_sv(nn)+dZ:dZ:z_sv(end)];
 apaznew = permute(interp1(z_sv,permute(apaz,[3 2 1]),z_svnew,'PCHIP',0),[3 2 1]);
 for ii = 1:size(apaznew,3)
     apaz_shifted(:,:,ii) = circshift(squeeze(apaznew(:,:,ii)),[0 10*ii]);%permute(interp1((t+tShift(ii))',permute((apaz(:,:,:,ii)),[3 2 1 ]),tTarg','spline',0),[3 2 1]);
@@ -23,8 +27,13 @@ for ii = 1:size(apaznew,3)
 %     apaz_shifted(:,:,ii) = interp1((t+tShift(ii))',squeeze(apaz_sv(:,:,ii))',tTarg','spline');%,0);
 end
 %% get an US cycle
-tt = 2739:2779;
+sig = squeeze(max(max(apaz_shifted,[],2),[],1));
+nn = find(sig == max(sig));
+tmp = squeeze(apaz_shifted(294,:,nn));
+tt = find(tmp == max(tmp(:))):find(tmp == max(tmp(:)))+40;
+% tt = 2739:2779;
 P = apaz_shifted(:,tt,:);
+plot(squeeze(P(294,:,nn)));
 clear apaz_shifted;
 clear Pori
 %% interpolate 2D to 3D profile using interp1
@@ -71,7 +80,7 @@ for i = 1+n/2:size(proj,1)-1-n/2
 end
 
 %% for real img
-ds = 3e-3/16/8;
+ds = 3e-3/16/7;
 
 locx = (squeeze(round(dx/(ds))));
 locz = (squeeze(round(dz/(ds))));
@@ -105,14 +114,14 @@ zdisloc = round(repmat(reshape(zzz,size(zzz,1),1,size(zzz,2)),1,nt,1)+loczz);
 %caculate coordinates for each pixel at each time point
 
 %%
-img = imread('./2018_02_09/IMG_0019.CR2');
-partimg = double(img(1+273:length(xloc)+273,1+1781:length(zloc)+1781,:));
+img = imread('./2018_02_09/IMG_0021.CR2');
+partimg = double(img(1+153:length(xloc)+153,1+1681:length(zloc)+1681,:));
 nX = size(locxd,1); nZ = size(locxd,3);
 nt = size(locxd,2);
 nn1 = round(dX/ds);
 nn2 = round(dZ/ds); 
 histmp = [];
-img = zeros(size(bkg));
+img = zeros(size(partimg));
 tmp = zeros(size(xdisloc,1),size(zdisloc,3));
 for kk = 1:nt
     ind = sub2ind([size(xdisloc,1),size(zdisloc,3)],squeeze(xdisloc(:,kk,:)),squeeze(zdisloc(:,kk,:)));
@@ -130,8 +139,6 @@ for kk = 1:nt
            [tz,tx] = meshgrid(indz,indx);  
            indind = sub2ind([nX*nn1,nZ*nn2],tx,tz);   
            ttimes = reshape(tab(indind(:),2),nn1,nn2);   
-%            block(ttimes==0) = 150/nt; %zeros or background value for the locations where there is no value???
-%            block = block./repmat(ttimes,1,1,3); 
            %if ttimes>1 divide it by times to get the sum of pixels which
            %are shifted to the same location 
            img(indx,indz,:) = img(indx,indz,:)+block./repmat(ttimes,1,1,3);
@@ -140,5 +147,5 @@ for kk = 1:nt
     histmp(:,:,:,kk) = img;%bkg;
 end
 tmp = nt - tmp;
-imshow(uint8(sum(histmp,4)./tmp));
-saveas(gcf,'./simuimg_00190227.jpg');
+imshow(flip(uint8(sum(histmp,4)./tmp),2));
+% saveas(gcf,'./simuimg_00410228.jpg');
