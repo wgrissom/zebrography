@@ -23,7 +23,7 @@ function [apaz_sv,dX,dY,dZ,nX,nY,z_sv] = wave_prop_simu(p0,a,f0,f_num,is_save)
 %| dZ        Wave propagation's step size 
 %|
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-beta=8; % nonlinear coefficient
+beta=3.5; % nonlinear coefficient in distilled water
 rho0=1000; % equilibrium density
 widePulse = true;
 omega0=2*pi*f0;
