@@ -36,7 +36,7 @@ In this study, there are three parts to quantitatively map focuced-ultrasound (F
   - demo_svd_trainDNN.py
     * Train a multi-layer deep neural network.
   - process_photo.m
-    * Sgement actual photos acquired by DSLR camera in to small pathes of rectangular histograms. 
+    * Segment actual photos acquired by DSLR camera in to small pathes of rectangular histograms. 
   - demo_predict.py
     * Reconstruct RMS projected pressure from actual photos. 
   - "model116.h5" and "model225.h5" are pre-trained model for two transducers (1.16MHz and 2.25MHz). 
