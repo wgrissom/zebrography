@@ -30,4 +30,13 @@ In this study, there are three parts to quantitatively map focuced-ultrasound (F
     * Modified camera shutter with an analog switch. 
      
 
-3. [Reconstruction](https://github.com/wgrissom/zebrography/tree/master/CWBOS/recon): Train deep neural network, process the acquired acutal photo by CW-BOS system and reconstruct root-mean-square(RMS) projected pressure by pre-trained neural network. 
+3. [Reconstruction](https://github.com/wgrissom/zebrography/tree/master/CWBOS/recon): Train deep neural network, process the acquired acutal photo by CW-BOS system and reconstruct root-mean-square(RMS) projected pressure by pre-trained neural network.
+  - demo_trainingdata_writer.py
+    * Write training data with HDF5 format.
+  - demo_svd_trainDNN.py
+    * Train a multi-layer deep neural network.
+  - process_photo.m
+    * Process actual photos acquired by DSLR camera. 
+  - demo_predict.py
+    * Reconstruct RMS projected pressure from actual photos. 
+  - "model116.h5" and "model225.h5" are pre-trained model for two transducers (1.16MHz and 2.25MHz). 
