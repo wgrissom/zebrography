@@ -26,7 +26,6 @@ Zd = 17.061e-2/2; % The distance between iPad screen and the middle of FUS beam.
 %[dxreal,dzreal] = forward_model_dxdz(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
 %proj = forward_model_proj(apaz_sv,dY,dZ,nX,nY,z_sv);
 [dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
-%[dxreal,
 save(['./data_eg/dataparams_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'dX','dY','dZ','nX','nZ','nY','p0','-v7.3');
 %save(['pressure_',num2str(p0),'_',num2str(f_num),'.mat'],'apaznew','-v7.3');
 save(['./data_eg/displacement_',num2str(p0),'_',num2str(f_num),'.mat'],'dxreal','dzreal','-v7.3');
@@ -107,7 +106,7 @@ for pp = 1:nP0
     his = permute(his(:,:,:),[3 1 2]);
     his = his(:,:);
 
-    save(['./data_eg/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his');
+    save(['./data_eg/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
 end
 %% Make a dictionary comprising of vectorized histograms and peform SVD on the dictionary.
 
@@ -119,51 +118,37 @@ P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in s
 %For 2.25MHz transducer, P0 = [325:150:2800]*100, f_num = [1,2,3];
 nP0 = length(P0);
 hisdic = [];
-for pp = 1:nP0
-%     load(['./data_eg/proj_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
-%     nx = size(proj,2);
-%     nz = size(proj,3);
-    load(['./data_eg/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
-
-    histest = his-his(1,:);
-    ind = find(sqrt(mean(histest.^2,2))~=0);
-    %each image is normalized by subtracting its own mean and being divided
-    %by its own standard deviation
-    %"ind" is used to delete the duplicated entries.
-    hisdic = cat(1,hisdic,(his(ind,:)-mean(his(ind,:),2))./std(his(ind,:),[],2));
+rmsproj = [];
+fnum = [1,2];
+for ff = 1:length(fnum)
+    for pp = 1:nP0
+        load(['./data_eg/proj_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
+        load(['./data_eg/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
+        proj = squeeze(proj(:,3:end-3,3:end-3));
+        nx = size(proj,2);
+        nz = size(proj,3);
+        proj = proj(:,:);
+        rms = squeeze(sqrt(mean(proj.^2,1)))';
+        histest = his-his(1,:);
+        ind = find(sqrt(mean(histest.^2,2))~=0);
+        %each image is normalized by subtracting its own mean and being divided
+        %by its own standard deviation
+        %"ind" is used to delete the duplicated entries.
+        hisdic = cat(1,hisdic,(his(ind,:)-mean(his(ind,:),2))./std(his(ind,:),[],2));
+        rmsproj = cat(1,rmsproj,rms(ind));
+    end
 end
-
-%Add a non-FUS histogram entries into the dictionary.
 hisdic = cat(1,hisdic,(his(1,:)-mean(his(1,:),2))./std(his(1,:),[],2));
-
-%%Perform SVD, truncate SVD space into a compressed subspace.
+rmsproj = cat(1,rmsproj,0);
 [~,S,V] = svd(hisdic,'econ');
 s_v = diag(S);
 e = cumsum(s_v.^2)./sum(s_v.^2);
 nDictSpace = sum(e<=1-1e-5);
-V_red = V(:,1:nDictSpace); %V_red here is the truncated right singular matrix. 
+V_red = V(:,1:nDictSpace);
+save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 
 
-%Then we project histograms into the truncated SVD space. 
-P0 = 152500;
-nP0 = length(P0);
-rmsproj = [];
-train = [];
-for pp = 1:nP0
-    %     data = load(['dict_',num2str(P0(pp)),'.mat']);
-    load(['./date_demo/proj_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
-    load(['./date_demo/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
-    proj = squeeze(proj(:,3:end-3,3:end-3));
-    nx = size(proj,2);
-    nz = size(proj,3);
-    proj = proj(:,:);
-    rms = squeeze(sqrt(mean(proj.^2,1)))';
-    his = (his(:,:)-mean(his(:,:),2))./std(his(:,:),[],2);
-    train = cat(1,train,his*V_red);
-    rmsproj = cat(1,rmsproj,rms(:));
-end
 
-save(['./date_demo/dict.mat'],'train','rmsproj','S','V','V_red','-v7.3');
 
 
 
