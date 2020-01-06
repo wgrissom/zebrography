@@ -20,13 +20,13 @@ for jj = 1:5
         fprintf(a,'%i',0);
         fprintf(a,'%i',0);
         fclose(a);
-        pause(2);  %Wait for the camera uploads the taken photos to the experment computer. 
+        pause(2);  %Wait for the camera to upload the taken photos to the experment computer. 
         fopen(a);
         fprintf(a,'%i',1);
         fprintf(a,'%f',50); 
         % With FUS on, send a TTL pulse to waveform generator, and wait 50ms and open the camera shutter. 
         fclose(a);
-        pause(2); %Wait for the camera uploads the taken photos to the experment computer. 
+        pause(2); %Wait for the camera to upload the taken photos to the experment computer. 
     end
 end
 
