@@ -5,11 +5,11 @@ function [dx,dz] = accum_d(pa,dX,dY,dZ,n)
 %|        pa, [Nt,Nx,Ny,Nz] simulated pressure
 %|        dX, dY  grid spacing
 %|        dZ  wave propagation's step size
-%|        n   order of finite difference
+%|        n   n-th order finite difference
 %| 
 %| Outputs: 
-%|        dx [Nt,Nx] physical displacements(m) in the x-dimension.
-%|        dz [Nt,Nx] physical displacements(m) in the z-dimension.
+%|        dx [Nt,Nx] physical displacements(meter) in the x-dimension.
+%|        dz [Nt,Nx] physical displacements(meter) in the z-dimension.
 
 %refractive angles
 tmp_proj =squeeze(sum(pa*dY,3));
@@ -21,7 +21,6 @@ end
 c = A\[0;1;zeros(n-1,1)];
 
 n0 = 1.3325; % base index of refraction
-% m, distance from center of US focus to background
 
 dn0dp = 14.83/101325*1e-6;% dindex/dPascal, from Waxler paper, read from Figure 2 at 24.8 deg CSS
 for kk = 1:n+1
