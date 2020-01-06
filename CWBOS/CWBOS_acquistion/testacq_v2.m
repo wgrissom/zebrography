@@ -8,28 +8,10 @@
 GenAddress='10.114.17.161'; % IP address of waveform generator
 hornSchunck=false; %whether or not to execute HS method
 %prevent from sending too much power to Xducer
-if amplitude > 400
-    error('amplitude is too high - 500mV is maximum')
-end
-%make strings of time for purposing of naming saved files chronologically
-% time=clock;
-% year = num2str(time(1));
-% month = num2str(time(2));
-% day = num2str(time(3));
-% %If there is no data storage location in current folder, create one
-% str = [pwd '\Data'];
-% if exist(str) ~= 7
-%     mkdir(str)
-% end
-% %If there is not a data storage location for today's data, create one
-% str = [str '/' year '.' month '.' day];
-% if exist(str) ~= 7
-%     mkdir(str)
-% end
+
 %% TCP/IP connection for function generator
 % Create TCP/IP object 'fncngen'. Specify server machine and port number.
 fncngen = tcpip(GenAddress, 5025,'NetworkRole','Client');
-
 % Set size of receiving buffer, if needed.
 set(fncngen, 'InputBufferSize', 30000);
 
@@ -42,6 +24,9 @@ disp('connection created!');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 freq = 1.16; % MHz
 amplitude = 200; %mVpp
+if amplitude > 400
+    error('amplitude is too high - 500mV is maximum')
+end
 fprintf(fncngen,'OUTP1 OFF;');
 fprintf(fncngen,'OUTP1:LOAD 50.0');
 fprintf(fncngen,'OUTP1:POL NORM');
@@ -97,4 +82,4 @@ for jj = 1:num_repetitions
     end
 end
 %%
-
+fprintf(fncngen,'OUTP1 OFF;');
