@@ -1,4 +1,4 @@
-function [dx,dz,proj] = forward_model(apaz_sv,dY,dZ,nX,nY,z_sv)
+function [dxreal,dzreal,proj] = forward_model(apaz_sv,dY,dZ,nX,nY,z_sv)
 
 %| Caculate projected pressure by summing up the simulated pressure along the
 %| line-of-sight direction.
@@ -8,6 +8,7 @@ function [dx,dz,proj] = forward_model(apaz_sv,dY,dZ,nX,nY,z_sv)
 %|
 %| Outputs:
 %| proj Projected pressure waveforms.
+%| dxreal,dzreal displacements in meters.
 
    % load(path,'apaz_sv','dY','dZ','nX','nY','z_sv'); 
     %load simulated pressure by a modified angular specturm method  
@@ -51,3 +52,47 @@ function [dx,dz,proj] = forward_model(apaz_sv,dY,dZ,nX,nY,z_sv)
         end
     end
     proj = single(proj);
+    
+    dx = zeros(nT,nX,nproj,nZ);
+    dz = zeros(nT,nX,nproj,nZ);
+    for jj = 1+n/2:nZ-n/2
+        tmp = apaznew(:,round(size(apaznew,2)/2)-round(nT/2):round(size(apaznew,2)/2)+round(nT/2)-1,jj-n/2:jj+n/2);
+        tmp_p = zeros(nT,nX,nY,n+1);
+        for kk = 1:nT
+            tmp_p(kk,:,:,:) = squeeze(interp1(r,squeeze(tmp(:,kk,:)),d,'pchip',0));
+        end
+        for kk = 1:nproj
+            pa = tmp_p(:,:,(kk-1)*delta_nY+1:kk*delta_nY,:);
+            [dxp,dzp] = accum_d(pa,dX,dY,dZ,n);
+            dx(:,:,kk,jj) = dxp;
+            dz(:,:,kk,jj) = dzp;
+        end
+    end
+    apaznew = single(apaznew);
+    [z0,x0] = meshgrid(z_svnew,(-round(nX/2):round(nX/2))*dX);
+    x0 = x0(2:end-1,:);
+    z0 = z0(2:end-1,:);
+    nXp = size(z0,1);
+    nZp = size(z0,2);
+    dxx = zeros(nT,nXp,nZp,nproj);
+    dzz = zeros(nT,nXp,nZp,nproj);
+    dxreal = zeros(nT,nXp,nZp);
+    dzreal = zeros(nT,nXp,nZp);
+    for kk = 1:nT
+        cenZp = z0;
+        cenXp = x0;
+        for nn = 1:nproj
+            dxp = interp2(z0,x0,squeeze(dx(kk,:,nn,:)),cenZp,cenXp,'cubic',0);
+            dzp = interp2(z0,x0,squeeze(dz(kk,:,nn,:)),cenZp,cenXp,'cubic',0);
+            dxx(kk,:,:,nn) = dxp;
+            dzz(kk,:,:,nn) = dzp;
+            dxtmp = delta_y*nn*(sum(dxx(kk,:,:,1:nn),4));
+            dztmp = delta_y*nn*(sum(dzz(kk,:,:,1:nn),4));
+            cenXp = x0 + squeeze(dxtmp);
+            cenZp = z0 + squeeze(dztmp);
+        end
+        dxreal(kk,:,:) =(dxtmp);
+        dzreal(kk,:,:) =(dztmp);
+    end
+    dxreal = single(dxreal);
+    dzreal = single(dzreal);
