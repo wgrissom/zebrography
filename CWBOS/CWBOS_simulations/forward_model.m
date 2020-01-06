@@ -1,4 +1,4 @@
-function [dxreal,dzreal,proj] = forward_model(apaz_sv,dY,dZ,nX,nY,z_sv)
+function [dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd)
 
 %| Caculate projected pressure by summing up the simulated pressure along the
 %| line-of-sight direction.
