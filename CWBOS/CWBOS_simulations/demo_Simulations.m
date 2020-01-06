@@ -23,8 +23,10 @@ is_save = false;
 % pattern using simulated pressure datasets above. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Zd = 17.061e-2/2; % The distance between iPad screen and the middle of FUS beam.
-[apaznew,dxreal,dzreal] = forward_model_dxdz(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
-proj = forward_model_proj(apaz_sv,dY,dZ,nX,nY,z_sv);
+%[dxreal,dzreal] = forward_model_dxdz(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
+%proj = forward_model_proj(apaz_sv,dY,dZ,nX,nY,z_sv);
+[dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
+%[dxreal,
 save(['./data_eg/dataparams_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'dX','dY','dZ','nX','nZ','nY','p0','-v7.3');
 %save(['pressure_',num2str(p0),'_',num2str(f_num),'.mat'],'apaznew','-v7.3');
 save(['./data_eg/displacement_',num2str(p0),'_',num2str(f_num),'.mat'],'dxreal','dzreal','-v7.3');
@@ -48,14 +50,20 @@ F2 = ft2(:);
 F1 = repmat([spdiag(ft1(:)) ones(nblock*nblock,1)],[size(block2,3) 1]);
 lambda = 1;
 x = (F1'*F1 + lambda*eye(nblock*nblock+1))\(F1'*F2);
-xfun = x; %%FFT of point spread function 
+win = fspecial('gaussian',54,17);%*fspecial('gaussian',54,10)';
+win = win ./ max(win(:));
+xfun = x(1:end-1).*win(:);
+figure; imagesc(abs(reshape(xfun,[54,54])))
+X = real(ift2(reshape(x(1:end-1),[nblock nblock])));
+fits = reshape(F1(:,1:end-1)*xfun(:),[nblock nblock size(block2,3)]);
+fits1 = (ifft2((fits(:,:,1))));
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now generate training data of simulated histograms!
 % Apply the calculated displacements above into non-FUS histograms, and
 % convolve with the point spread function.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ds = 25.4/264*1e-3*1668/834/6; %% width of each pixel
+ds = 25.4/264*1e-3*1668/834/8; %% width of each pixel
 P0 = 152500;
 nT = 40;
 n = 4;
