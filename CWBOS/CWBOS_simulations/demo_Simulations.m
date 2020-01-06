@@ -49,7 +49,7 @@ F2 = ft2(:);
 F1 = repmat([spdiag(ft1(:)) ones(nblock*nblock,1)],[size(block2,3) 1]);
 lambda = 1;
 x = (F1'*F1 + lambda*eye(nblock*nblock+1))\(F1'*F2);
-win = fspecial('gaussian',54,17);%*fspecial('gaussian',54,10)';
+win = fspecial('gaussian',54,17);
 win = win ./ max(win(:));
 xfun = x(1:end-1).*win(:);
 figure; imagesc(abs(reshape(xfun,[54,54])))
