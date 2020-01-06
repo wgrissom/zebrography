@@ -1,4 +1,4 @@
-function [apaznew,dxreal,dzreal] = forward_model_dxdz(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd)
+function [dxreal,dzreal] = forward_model_dxdz(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd)
 
 %| Caculate projected pressure by summing up the simulated pressure along the
 %| line-of-sight direction.
@@ -8,7 +8,8 @@ function [apaznew,dxreal,dzreal] = forward_model_dxdz(apaz_sv,dX,dY,dZ,nX,nY,z_s
 %| Zd     The distance from the middle of the FUS beam to the iPad screen. 
 %|
 %| Outputs:
-%| proj Projected pressure waveforms.
+%| apaznew
+%| dxreal,dzreal Projected pressure waveforms.
   %  load(path,'apaz_sv','dX','dY','dZ','nX','nY','z_sv','dT','nT')
     apaz_sv = apaz_sv(2:end-1,:,:);
     nX = nX - 2;
