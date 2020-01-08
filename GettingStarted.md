@@ -173,9 +173,7 @@ nDictSpace = sum(e<=1-1e-5);
 V_red = V(:,1:nDictSpace);
 save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ```
-###### Notes.
-###### 1. "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final tranining set. 
-###### 2.Python script "/recon/demo_traniningdata_writer.py" cane be used to covert and large "*mat" file to "*.hdf5". 
+###### Notes: 1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final tranining set; 2) Python script "/recon/demo_traniningdata_writer.py" cane be used to covert and large "*mat" file to "*.hdf5". 
 7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network. Traning set ("dict_info*.hdf5, dict_target*.hdf5 and dict_train*.hdf5) used in the paper  is in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601557.svg)](https://doi.org/10.5281/zenodo.3601557). 
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
 9. Run the python script "/recon/demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
