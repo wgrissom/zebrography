@@ -37,9 +37,9 @@ These instructions will get you a copy of the project up and running on your loc
 10. Open the amplifier and then open the output of the waveform generator
 11. Run  "/CWBOS_acquistion/testacq_v1.m” on the experiment computer and in the meantime photos can be saved on the experiment computer. 
 
-##### A group of experimental photos are given in 
 
-### Software execution
+
+### Software Execution
 ---
 #### Training set generation
 1. Simulate spatially- and temporally-resolved steady-state FUS pressure fields with nonlinearity using "/CWBOS_simulations/wave_prop_simu.m". An example of simulated data is stored in "p0_152500.mat".
