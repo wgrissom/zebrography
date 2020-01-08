@@ -22,7 +22,6 @@ These instructions will get you a copy of the project up and running on your loc
 * Waveform generator
 * Amplifier 
 * An Arduino board, a wired DSLR camera shutter and an analog switch
-* Ethernet cable
 
 ### CW-BOS Photo Acquisition Process
 ---
