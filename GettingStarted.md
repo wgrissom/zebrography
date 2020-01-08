@@ -3,6 +3,8 @@ Getting Started
 ==
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+#### All the example data are published in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601557.svg)](https://doi.org/10.5281/zenodo.3601557).
+
 ### Prerequisites
 ----
 
@@ -40,8 +42,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Software execution
 ---
 #### Training set generation
-1. Simulate spatially- and temporally-resolved steady-state FUS pressure fields with nonlinearity using "/CWBOS_simulations/wave_prop_simu.m".  An example of simulated data is stored in "p0_152500.mat" [![
-](https://zenodo.org/badge/DOI/10.5281/zenodo.3601557.svg)](https://doi.org/10.5281/zenodo.3601557)
+1. Simulate spatially- and temporally-resolved steady-state FUS pressure fields with nonlinearity using "/CWBOS_simulations/wave_prop_simu.m".  An example of simulated data is stored in "p0_152500.mat".
 
 ```
 p0 = 152500; % Transmitter pressure amplitude  
@@ -87,7 +88,7 @@ fits = reshape(F1(:,1:end-1)*xfun(:),[nblock nblock size(block2,3)]);
 fits1 = (ifft2((fits(:,:,1))));
 
 ```
-4. Generate simulated histograms. Simulated histograms of p0 = 152500 and f_num = 2 is given in "his_152500_2.mat" [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601557.svg)](https://doi.org/10.5281/zenodo.3601557)
+4. Generate simulated histograms. Simulated histograms of p0 = 152500 and f_num = 2 is given in "his_152500_2.mat".
 ```
 ds = 25.4/264*1e-3*1668/834/8; %% width of each pixel
 P0 = 152500;
@@ -136,7 +137,7 @@ his = his(:,:);
 save(['his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
 end
 ```
-5. Concatenate histograms, perform the singular value decomposition (SVD), and project them into the SVD subspace. A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat" in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601557.svg)](https://doi.org/10.5281/zenodo.3601557)
+5. Concatenate histograms, perform the singular value decomposition (SVD), and project them into the SVD subspace. A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
 ```
 P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
 
@@ -173,10 +174,10 @@ nDictSpace = sum(e<=1-1e-5);
 V_red = V(:,1:nDictSpace);
 save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ```
-###### Notes: 1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final tranining set; 2) Python script "/recon/demo_traniningdata_writer.py" cane be used to covert and large "*mat" file to "*.hdf5". 
-7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network. Traning set ("dict_info*.hdf5, dict_target*.hdf5 and dict_train*.hdf5) used in the paper  is in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601557.svg)](https://doi.org/10.5281/zenodo.3601557). 
+###### Notes: 1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final tranining set; 2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
+
+7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network.
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
 9. Run the python script "/recon/demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
 
-#### Again, all the data are published in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601557.svg)](https://doi.org/10.5281/zenodo.3601557).
 
