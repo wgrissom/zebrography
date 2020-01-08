@@ -172,8 +172,8 @@ V_red = V(:,1:nDictSpace);
 save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ```
 
-1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final training set;
-2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
+(1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final training set;
+(2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
 
 7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network.
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
