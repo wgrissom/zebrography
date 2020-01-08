@@ -83,7 +83,7 @@ fits = reshape(F1(:,1:end-1)*xfun(:),[nblock nblock size(block2,3)]);
 fits1 = (ifft2((fits(:,:,1))));
 
 ```
-4. Generate simulated histograms. Simulated histograms of p0 = 152500 and f_num = 2 is given in "his_152500_2..mat" in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601483.svg)](https://doi.org/10.5281/zenodo.3601483)
+4. Generate simulated histograms shown in "/CWBOS_simulations/demo_Simulations". Simulated histograms of p0 = 152500 and f_num = 2 is given in "his_152500_2..mat" in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601483.svg)](https://doi.org/10.5281/zenodo.3601483)
 ```
 ds = 25.4/264*1e-3*1668/834/8; %% width of each pixel
 P0 = 152500;
@@ -169,7 +169,7 @@ nDictSpace = sum(e<=1-1e-5);
 V_red = V(:,1:nDictSpace);
 save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ```
-####### Tips: Python script "/recon/demo_traniningdata_writer.py" cane be used to covert and large "*mat" file to "*.hdf5". 
+###### Tips: Python script "/recon/demo_traniningdata_writer.py" cane be used to covert and large "*mat" file to "*.hdf5". 
 7. Open Python and run the script "/recon/svd_trainDNN.py" to train the neural network. Traning set ("dict_info*.hdf5, dict_target*.hdf5 and dict_train*.hdf5) used in the paper  is in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601483.svg)](https://doi.org/10.5281/zenodo.3601483). 
 8. Run the Matlab script "process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
 9. Run the python script "demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
