@@ -50,7 +50,7 @@ a = 31.6e-3; % [m] Source radius.
 f_num = 2; % f-number of focused-ultrasound.  
 [apaz_sv,dX,dY,dZ,nX,nY,z_sv] = wave_prop_simu(p0,a,f0,f_num);  
 ```
-###### Tips: Save simulated pressure data of each amplitude for convenience.
+###### Tips: Save simulated pressure data of each amplitude for convenience in future. 
 
 2.  Calculate projected pressure and physical displacements in meters by "/CW_simulations/forward_model.m". 
 ```Matlab
@@ -136,7 +136,7 @@ save(['his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
 end
 ```
 
-5. Concatenate histograms, perform the singular value decomposition (SVD), and project them into the SVD subspace. A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
+5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrx "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
 
 ```Matlab
 P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
@@ -172,7 +172,9 @@ V_red = V(:,1:nDictSpace);
 save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ```
 
-###### Notes: 1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final training set; 2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
+1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final training set;
+2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
+
 7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network.
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
 9. Run the python script "/recon/demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
