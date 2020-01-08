@@ -1,0 +1,177 @@
+
+Getting Started
+==
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+### Prerequisites
+----
+
+#### Software
+* MATLAB
+* Python (Tensorflow, Keras and [Keras processing](https://github.com/keras-team/keras-preprocessing))
+* An App which can run Python script on the tablet, for example,  [Pythonista](http://omz-software.com/pythonista/)  is installed on the iPad Pro in our studies.
+
+#### Hardware Setup
+* An ultra-clear rimless water tank
+* An acoustic absorber (Aptflex F48, Precision Acoustic Ltd, UK)
+* A mega-pixel digital singe-lens reflex camera
+* Tablet to display the background pattern (e.g.: iPad Pro)
+* Focused-ultrasound (FUS) transducer
+* Waveform generator
+* Amplifier 
+* An Arduino board, a wired DSLR camera shutter and an analog switch
+* Ethernet cable
+
+### CW-BOS Photo Acquisition Process
+---
+1. Fill the water tank with degassed deionized water.
+2. Connect an Arduino Board to the external port of waveform generator and the analog switch that is connected to the wired switch ("/CWBOS_acquisition/modified_camera_shutter_design.zip").
+3. Connect the wave generator to the amplitifer, and connect the amplitifier to the focused-ultrasound transducer. Connect the DSLR camera to the experimental computer via USB and open the software to control the camera remotely (e.g.: EOS Utility Software for Canon DSLR camera). 
+4. Compile the code "/CWBOS_acquisition/ShutterController_Arduino.ino" on the Arduino board. 
+5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the app in mind!
+6. Change the IP address in the "/CWBOS_acquistion/testacq_v1.m' and set other parameters in the script.
+7. Set the parameters of waveform generator and the camera paramters.
+8. Put the black cloth over the water tank and the camera setup to supress the ambient light.
+10. Open the amplifier and then open the output of the waveform generator
+11. Run  "/CWBOS_acquistion/testacq_v1.m” on the experiment computer and in the meantime photos can be saved on the experiment computer.
+
+### Software execution
+---
+#### Training set generation
+1. Simulate spatially- and temporally-resolved steady-state FUS pressure fields with nonlinearity using "/CWBOS_simulations/wave_prop_simu.m".  An example of simulated data is stored in "p0_152500.mat" in  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601483.svg)](https://doi.org/10.5281/zenodo.3601483)
+
+```
+p0 = 152500; % Transmitter pressure amplitude  
+f0 = 1.1e6; % [Hz] Center frequency of focused-ultrasound  
+a = 31.6e-3; % [m] Source radius.  
+f_num = 2; % f-number of focused-ultrasound.  
+[apaz_sv,dX,dY,dZ,nX,nY,z_sv] = wave_prop_simu(p0,a,f0,f_num);  
+```
+###### Tips: Save simulated pressure data (output of "wave_prop_simu" here because it takes us very long time for each simulation).
+
+2.  Calculate projected pressure and physical displacements in meters. 
+```
+Zd = 17.061e-2/2; % Distance between iPad screen and the middle of FUS beam.
+[dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
+```
+###### "dxreal" and "dzreal" are displacements in x- and z-deimension, respectively. "proj" is projected pressure waveform. 
+3. Calculate the point spread function from the actual photo taken by camera. 
+You can look for a good number of size of histograms. We decide the simulated histogram as a 54-by-54 (pixels) square by counting pixels from the actual photo. Same as the pin width. One example is below:
+
+```
+nblock = 54; % Size of blocks, even number to be consistent with ipad and camera
+npin = 6;% pin: 1 pixel, spacing: 8 pixels
+blocks = ones(nblock,nblock);
+PSF = fspecial('average',3);
+blocks((nblock-npin+2)/2:(nblock+npin)/2,(nblock-npin+2)/2:(nblock+npin)/2) = 0;
+block1 = blocks;
+load('./data_eg/seg.mat')
+block2 = seg.unblur(:,:,8,13:14);
+block2 = block2(:,:,:); % collapse third and fourth dimensions
+ft1 = fftshift(fftshift(fft2(block1),1),2);
+ft2 = fftshift(fftshift(fft2(block2),1),2);
+F2 = ft2(:);
+F1 = repmat([spdiag(ft1(:)) ones(nblock*nblock,1)],[size(block2,3) 1]);
+lambda = 1;
+x = (F1'*F1 + lambda*eye(nblock*nblock+1))\(F1'*F2);
+win = fspecial('gaussian',54,17);
+win = win ./ max(win(:));
+xfun = x(1:end-1).*win(:);
+figure; imagesc(abs(reshape(xfun,[54,54])))
+X = real(ift2(reshape(x(1:end-1),[nblock nblock])));
+fits = reshape(F1(:,1:end-1)*xfun(:),[nblock nblock size(block2,3)]);
+fits1 = (ifft2((fits(:,:,1))));
+
+```
+4. Generate simulated histograms. Simulated histograms of p0 = 152500 and f_num = 2 is given in "his_152500_2..mat" in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601483.svg)](https://doi.org/10.5281/zenodo.3601483)
+```
+ds = 25.4/264*1e-3*1668/834/8; %% width of each pixel
+P0 = 152500;
+nT = 40;
+n = 4;
+nP0 = length(P0);
+nblock = 54; % Size of blocks, even number to be consistent with ipad and camera
+npin = 6;% pin: 1 pixel, spacing: 8 pixels
+blocks = ones(nblock,nblock);
+blocks((nblock-npin+2)/2:(nblock+npin)/2,(nblock-npin+2)/2:(nblock+npin)/2) = 0;
+f_num = 2;
+for pp = 1:nP0
+load(['./data_eg/displacement_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
+locx = round(dxreal/ds);
+locz = round(dzreal/ds);
+nX = size(locx,2);
+nZ = size(locz,3);
+his = zeros(nblock,nblock,nX,nZ);
+for ii = 1+n/2:nX-n/2-1
+for jj = 1+n/2:nZ-n/2-1
+histmp = zeros(nblock,nblock);
+for kk = 1:nT
+x = round(locx(kk,ii,jj)); z = round(locz(kk,ii,jj));
+histmp = histmp +  circshift(blocks,[x,z]);
+end
+histmp = histmp/nT;
+%-------------------------------------------------------------%
+%Apply the point spread funtion for the simple simulated FUS
+%histograms. xfun is the frequency transform of the calculated
+%point spread function by last section.
+ft1 = fftshift(fftshift(fft2(histmp),1),2);
+F1 = [spdiag(ft1(:)) ones(nblock*nblock,1)];
+fits = reshape(F1*xfun(:),[nblock nblock]);
+fits1 = abs(ifft2(fits(:,:,1)));
+%--------------------------------------------------------------%
+his(:,:,ii,jj) = fits1;
+end
+end
+his = single(his(:,:,3:end-3,3:end-3));
+nx = size(his,3); nz = size(his,4);
+%Vectorize rectangular histograms. 
+his = his(:,:,:); 
+his = permute(his(:,:,:),[3 1 2]);
+his = his(:,:);
+
+save(['./data_eg/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
+end
+```
+5. Concatenate histograms, perform the singular value decomposition (SVD), and project them into the SVD subspace. A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat" in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601483.svg)](https://doi.org/10.5281/zenodo.3601483)
+```
+P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
+
+%For 1.16MHz H101 transducer, P0 = [325:150:2725]*100, f_num = [1,2]
+%For 2.25MHz transducer, P0 = [325:150:2800]*100, f_num = [1,2,3];
+nP0 = length(P0);
+hisdic = [];
+rmsproj = [];
+fnum = [1,2];
+for ff = 1:length(fnum)
+    for pp = 1:nP0
+        load(['./data_eg/proj_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
+        load(['./data_eg/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
+        proj = squeeze(proj(:,3:end-3,3:end-3));
+        nx = size(proj,2);
+        nz = size(proj,3);
+        proj = proj(:,:);
+        rms = squeeze(sqrt(mean(proj.^2,1)))';
+        histest = his-his(1,:);
+        ind = find(sqrt(mean(histest.^2,2))~=0);
+        %each image is normalized by subtracting its own mean and being divided
+        %by its own standard deviation
+        %"ind" is used to delete the duplicated entries.
+        hisdic = cat(1,hisdic,(his(ind,:)-mean(his(ind,:),2))./std(his(ind,:),[],2));
+        rmsproj = cat(1,rmsproj,rms(ind));
+    end
+end
+hisdic = cat(1,hisdic,(his(1,:)-mean(his(1,:),2))./std(his(1,:),[],2));
+rmsproj = cat(1,rmsproj,0);
+[~,S,V] = svd(hisdic,'econ');
+s_v = diag(S);
+e = cumsum(s_v.^2)./sum(s_v.^2);
+nDictSpace = sum(e<=1-1e-5);
+V_red = V(:,1:nDictSpace);
+save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
+```
+####### Tips: Python script "/recon/demo_traniningdata_writer.py" cane be used to covert and large "*mat" file to "*.hdf5". 
+7. Open Python and run the script "/recon/svd_trainDNN.py" to train the neural network. Traning set ("dict_info*.hdf5, dict_target*.hdf5 and dict_train*.hdf5) used in the paper  is in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3601483.svg)](https://doi.org/10.5281/zenodo.3601483). 
+8. Run the Matlab script "process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
+9. Run the python script "demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
+
+
