@@ -42,32 +42,31 @@ These instructions will get you a copy of the project up and running on your loc
 ### Software execution
 ---
 #### Training set generation
-1. Simulate spatially- and temporally-resolved steady-state FUS pressure fields with nonlinearity using "/CWBOS_simulations/wave_prop_simu.m".  An example of simulated data is stored in "p0_152500.mat".
+1. Simulate spatially- and temporally-resolved steady-state FUS pressure fields with nonlinearity using "/CWBOS_simulations/wave_prop_simu.m". An example of simulated data is stored in "p0_152500.mat".
 
-```
+```Matlab
 p0 = 152500; % Transmitter pressure amplitude  
 f0 = 1.1e6; % [Hz] Center frequency of focused-ultrasound  
 a = 31.6e-3; % [m] Source radius.  
 f_num = 2; % f-number of focused-ultrasound.  
 [apaz_sv,dX,dY,dZ,nX,nY,z_sv] = wave_prop_simu(p0,a,f0,f_num);  
 ```
-###### Tips: Save simulated pressure data of each amplitude to save time.
+###### Tips: Save simulated pressure data of each amplitude for convenience.
 
 2.  Calculate projected pressure and physical displacements in meters by "/CW_simulations/forward_model.m". 
-```
+```Matlab
 Zd = 17.061e-2/2; % Distance between iPad screen and the middle of FUS beam.
 [dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
 ```
 ###### "dxreal" and "dzreal" are displacements in x- and z-dimension, respectively. "proj" is projected pressure waveform. 
 
 3. Calculate the point spread function from the actual photo taken by camera. 
-You can look for a good number of size of histograms. We decide the simulated histogram as a 54-by-54 (pixels) square by counting pixels from the actual photo. Same as the pin width. One example is below:
+You can decide the size of histograms on your own. We decide it and pin width by counting pixels from the actual photo. One example is below:
 
-```
+```Matlab
 nblock = 54; % Size of blocks, even number to be consistent with iPad and camera
 npin = 6;% pin: 1 pixel, spacing: 8 pixels
 blocks = ones(nblock,nblock);
-PSF = fspecial('average',3);
 blocks((nblock-npin+2)/2:(nblock+npin)/2,(nblock-npin+2)/2:(nblock+npin)/2) = 0;
 block1 = blocks;
 load('seg.mat')
@@ -86,10 +85,11 @@ figure; imagesc(abs(reshape(xfun,[54,54])))
 X = real(ift2(reshape(x(1:end-1),[nblock nblock])));
 fits = reshape(F1(:,1:end-1)*xfun(:),[nblock nblock size(block2,3)]);
 fits1 = (ifft2((fits(:,:,1))));
+```
 
-```
-4. Generate simulated histograms. Simulated histograms of p0 = 152500 and f_num = 2 is given in "his_152500_2.mat".
-```
+4. Generate simulated histograms. Simulated histograms of p0 = 152500 and f_num = 2 are given in "his_152500_2.mat".
+
+```Matlab
 ds = 25.4/264*1e-3*1668/834/8; %% width of each pixel
 P0 = 152500;
 nT = 40;
@@ -108,24 +108,24 @@ nX = size(locx,2);
 nZ = size(locz,3);
 his = zeros(nblock,nblock,nX,nZ);
 for ii = 1+n/2:nX-n/2-1
-for jj = 1+n/2:nZ-n/2-1
-histmp = zeros(nblock,nblock);
-for kk = 1:nT
-x = round(locx(kk,ii,jj)); z = round(locz(kk,ii,jj));
-histmp = histmp +  circshift(blocks,[x,z]);
-end
-histmp = histmp/nT;
-%-------------------------------------------------------------%
-%Apply the point spread funtion for the simple simulated FUS
-%histograms. xfun is the frequency transform of the calculated
-%point spread function by last section.
-ft1 = fftshift(fftshift(fft2(histmp),1),2);
-F1 = [spdiag(ft1(:)) ones(nblock*nblock,1)];
-fits = reshape(F1*xfun(:),[nblock nblock]);
-fits1 = abs(ifft2(fits(:,:,1)));
-%--------------------------------------------------------------%
-his(:,:,ii,jj) = fits1;
-end
+    for jj = 1+n/2:nZ-n/2-1
+    histmp = zeros(nblock,nblock);
+        for kk = 1:nT
+        x = round(locx(kk,ii,jj)); z = round(locz(kk,ii,jj));
+        histmp = histmp +  circshift(blocks,[x,z]);
+        end
+    histmp = histmp/nT;
+    %-------------------------------------------------------------%
+    %Apply the point spread funtion for the simple simulated FUS
+    %histograms. xfun is the frequency transform of the calculated
+    %point spread function by last section.
+    ft1 = fftshift(fftshift(fft2(histmp),1),2);
+    F1 = [spdiag(ft1(:)) ones(nblock*nblock,1)];
+    fits = reshape(F1*xfun(:),[nblock nblock]);
+    fits1 = abs(ifft2(fits(:,:,1)));
+    %--------------------------------------------------------------%
+    his(:,:,ii,jj) = fits1;
+    end
 end
 his = single(his(:,:,3:end-3,3:end-3));
 nx = size(his,3); nz = size(his,4);
@@ -133,16 +133,14 @@ nx = size(his,3); nz = size(his,4);
 his = his(:,:,:); 
 his = permute(his(:,:,:),[3 1 2]);
 his = his(:,:);
-
 save(['his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
 end
 ```
-5. Concatenate histograms, perform the singular value decomposition (SVD), and project them into the SVD subspace. A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
-```
-P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
 
-%For 1.16MHz H101 transducer, P0 = [325:150:2725]*100, f_num = [1,2]
-%For 2.25MHz transducer, P0 = [325:150:2800]*100, f_num = [1,2,3];
+5. Concatenate histograms, perform the singular value decomposition (SVD), and project them into the SVD subspace. A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
+
+```Matlab
+P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
 nP0 = length(P0);
 hisdic = [];
 rmsproj = [];
@@ -174,8 +172,8 @@ nDictSpace = sum(e<=1-1e-5);
 V_red = V(:,1:nDictSpace);
 save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ```
-###### Notes: 1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final tranining set; 2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
 
+###### Notes: 1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final training set; 2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
 7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network.
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
 9. Run the python script "/recon/demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
