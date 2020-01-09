@@ -29,8 +29,13 @@ These instructions will get you a copy of the project up and running on your loc
 2. Connect an Arduino Board to the external port of waveform generator and the analog switch that is connected to the wired switch (see the shutter design in "/CWBOS_acquisition/modified_camera_shutter_design.zip").
 3. Connect the wave generator to the amplifier, and connect the amplifier to the focused-ultrasound transducer. Connect the DSLR camera to the experimental computer via USB and open the software to control the camera remotely (e.g.: EOS Utility Software for Canon DSLR camera). 
 4. Compile the code "/CWBOS_acquisition/ShutterController_Arduino.ino" on the Arduino board. 
+<<<<<<< HEAD
 5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the APP in mind!
 6. Change the IP address in the "/CWBOS_acquisition/testacq.m' and set other parameters in the script.
+=======
+5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the app in mind!
+6. Change the IP address in the "/CWBOS_acquistion/testacq_v1.m' and set other parameters in the script.
+>>>>>>> 9a598f9406b904bb3277359f4f406994c53ec729
 7. Set the parameters of waveform generator and the camera parameters.
 8. Put the black cloth over the water tank and the camera setup to suppress the ambient light.
 10. Open the amplifier and then open the output of the waveform generator
@@ -136,10 +141,17 @@ save(['his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
 end
 ```
 
+<<<<<<< HEAD
 5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrix "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
 
 ```Matlab
 P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simulations. 
+=======
+5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrx "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
+
+```Matlab
+P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
+>>>>>>> 9a598f9406b904bb3277359f4f406994c53ec729
 nP0 = length(P0);
 hisdic = [];
 rmsproj = [];
@@ -176,7 +188,11 @@ save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 (2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
 
 7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network.
+<<<<<<< HEAD
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the experiments and save the set of histograms.
+=======
+8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
+>>>>>>> 9a598f9406b904bb3277359f4f406994c53ec729
 9. Run the python script "/recon/demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
 
 
