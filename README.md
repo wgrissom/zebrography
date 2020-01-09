@@ -19,9 +19,9 @@ In this study, there are three parts to quantitatively map focused-ultrasound (F
     * Workflow to acquire FUS and non-FUS photos.
     * Need to call "BOSTomoController.py" to communicate with iPad. 
   - BOSTomoController.py 
-    * To be ran on the experiment computer to switch the background pattern.
+    * On the experiment computer to switch the background pattern.
   - BOSTomoDisplay_app_IPad.py 
-    * To be ran on an app named [Pythonista](http://omz-software.com/pythonista/) of iPad to display background patterns and IP address of iPad.
+    * On an APP named [Pythonista](http://omz-software.com/pythonista/) of the iPad to display background patterns and IP address of iPad.
   - ShutterController_Arduino.ino
     * Code to be uploaded to the Arduino board, which allows Arduino to control waveform generator and DLSR camera.
   - Modified_camera_shutter_design.zip
