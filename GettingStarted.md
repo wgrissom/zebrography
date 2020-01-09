@@ -186,9 +186,6 @@ save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ###### b) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
 7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network.
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the experiments and save the set of histograms.
-=======
-8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the experiments and save the set of histograms.
-
 9. Run the python script "/recon/demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
 
 
