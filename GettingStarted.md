@@ -33,13 +33,12 @@ These instructions will get you a copy of the project up and running on your loc
 5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the APP in mind!
 6. Change the IP address in the "/CWBOS_acquisition/testacq.m' and set other parameters in the script.
 =======
-5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the app in mind!
-6. Change the IP address in the "/CWBOS_acquistion/testacq_v1.m' and set other parameters in the script.
->>>>>>> 9a598f9406b904bb3277359f4f406994c53ec729
+5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the APP in mind!
+6. Change the IP address in the "/CWBOS_acquistion/testacq.m' and set other parameters in the script.
 7. Set the parameters of waveform generator and the camera parameters.
 8. Put the black cloth over the water tank and the camera setup to suppress the ambient light.
 10. Open the amplifier and then open the output of the waveform generator
-11. Run  "/CWBOS_acquistion/testacq_v1.m” on the experiment computer and in the meantime photos can be saved on the experiment computer. 
+11. Run  "/CWBOS_acquistion/testacq.m” on the experiment computer and in the meantime photos can be saved on the experiment computer. 
 
 
 
@@ -141,17 +140,16 @@ save(['his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
 end
 ```
 
-<<<<<<< HEAD
 5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrix "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
 
 ```Matlab
 P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simulations. 
 =======
-5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrx "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
+5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrix "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
 
 ```Matlab
-P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
->>>>>>> 9a598f9406b904bb3277359f4f406994c53ec729
+P0 = 152500; %% we saved each simulated dataset by p0 (transmitter pressure) in simulations. 
+
 nP0 = length(P0);
 hisdic = [];
 rmsproj = [];
@@ -184,15 +182,13 @@ V_red = V(:,1:nDictSpace);
 save(['dict.mat'],'hisdic','rmsproj','V','S','V_red','-v7.3')
 ```
 
-(1) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final training set;
-(2) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
-
+###### a) "/CW_simulations/demo_simulations.m" includes the whole process to acquire the final training set;
+###### b) Python script "/recon/demo_traniningdata_writer.py" can be used to covert and large "*mat" file to "*.hdf5".
 7. Run the Python script "/recon/svd_trainDNN.py" to train the neural network.
-<<<<<<< HEAD
 8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the experiments and save the set of histograms.
 =======
-8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the expriments and save the set of histograms.
->>>>>>> 9a598f9406b904bb3277359f4f406994c53ec729
+8. Run the Matlab script "/recon/process_photo.m" to process the actual photos that you acquire in the experiments and save the set of histograms.
+
 9. Run the python script "/recon/demo_predict.py" to reconstruct the root-mean-square projected pressure maps.
 
 
