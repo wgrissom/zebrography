@@ -22,12 +22,12 @@ import h5py
 from random import shuffle
 import svd_generator
 
-dict1 =h5py.File('/scratch/luoh3/dict_train0910svd116.hdf5','r')
+dict1 =h5py.File('dict_train116.hdf5','r')
 x_train= np.float32(dict1['train'])
-dict2 =h5py.File('dict_target0910svd116.hdf5','r')
+dict2 =h5py.File('dict_target116.hdf5','r')
 rmsprojtrain= np.float32(dict2['rmsproj'])
 print(np.size(rmsprojtrain))
-dict3 =h5py.File('dict_info0910svd116.hdf5','r')
+dict3 =h5py.File('dict_info116.hdf5','r')
 V_red= np.float32(dict3['V_red'])
 y_train = rmsprojtrain
 
@@ -43,31 +43,17 @@ input_shape = x_train.shape[1:]
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print('y_train shape:', y_train.shape)
-y_train = (y_train-y_train.mean())/y_train.std()
+y_train = (y_train-y_train.mean())/y_train.std() # normalize the target set; will make reconstructed pressure back when predicting. 
 ind_list = [i for i in range(np.size(x_train,axis = 0))]
 shuffle(ind_list)
-x_train = x_train[ind_list,:]
+x_train = x_train[ind_list,:] # shuffle the traning set randomly. 
 y_train = y_train[ind_list,:]
 
-def lr_schedule(epoch):
-    """Learning Rate Schedule
 
-    Learning rate is scheduled to be reduced after 80, 120, 160, 180 epochs.
-    Called automatically every epoch as part of callbacks during training.
-
-    # Arguments
-        epoch (int): The number of epochs
-
-    # Returns
-        lr (float32): learning rate
-    """
-    lr = 5e-5
-    print('Learning rate: ', lr)
-    return lr
-    
+# Build the neural network. 
 name = 'model' 
-n1 = 2e-5
-n2 = 2e-4
+n1 = 2e-5 # l1-norm regularizer
+n2 = 2e-4 # l2-norm regularizer
 dim = V_red.shape[1]
 model = Sequential()
 model.add(Dense(dim,kernel_regularizer=regularizers.l1_l2(l1 = n1, l2 = n2),kernel_initializer='he_normal',input_shape=(dim,),activation = 'tanh'))
@@ -75,8 +61,6 @@ model.add(Dense(dim,kernel_regularizer=regularizers.l1_l2(l1 =  0, l2 = n2),kern
 model.add(Dense(dim,kernel_regularizer=regularizers.l1_l2(l1 =  0, l2 = n2),kernel_initializer='he_normal',activation = 'tanh'))
 model.add(Dense(dim,kernel_regularizer=regularizers.l1_l2(l1 =  0, l2 = n2),kernel_initializer='he_normal',activation = 'tanh'))
 model.add(Dense(1,kernel_initializer='he_normal',kernel_regularizer=regularizers.l1_l2(l1 =  0, l2 = n2),activation = 'linear'))
-
-
 model.summary() 
 # print the model summary
 
@@ -87,7 +71,7 @@ model.compile(loss='mean_squared_error',
 
 # Prepare model model saving directory.
 save_dir = os.path.join(os.getcwd(), 'model_dnn')
-model_name = 'zebra_%s_model.{epoch:03d}.h5'
+model_name = 'zebra_model_{epoch:03d}.h5'
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 filepath = os.path.join(save_dir, model_name)
@@ -98,24 +82,18 @@ checkpoint = ModelCheckpoint(filepath=filepath,
                              verbose=1,
                              save_best_only=True)
 
-lr_scheduler = LearningRateScheduler(lr_schedule)
-
 lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
                                cooldown=0,
                                patience=5,
                                min_lr=0.5e-6)
 
-callbacks = [checkpoint, lr_reducer, lr_scheduler]
-
-batch_size =1024
-epochs = 20
-
-#This is a modifed data generator to project vectorized histograms into the compressed SVD subspace.
+callbacks = [checkpoint, lr_reducer]
 
 batch_size =1024
 num_classes = 1
 epochs = 20
 import svd_generator
+#This is a modifed data generator to project vectorized histograms into the compressed SVD subspace.
 datagen = svd_generator.ImageDataGenerator(
     rotation_range=30,
     validation_split = 0,

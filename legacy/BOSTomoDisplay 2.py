@@ -1,6 +1,5 @@
 '''
-An APP for displaying background patterns for BOS tomography ran on the iPad.
-
+An app for displaying background patterns for BOS tomography
 Will Grissom, Vanderbilt University, 2018
 '''
 

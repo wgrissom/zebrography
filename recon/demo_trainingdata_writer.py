@@ -3,7 +3,7 @@
 """
 Training data writer.
 
-This scirpt is used to compress *.mat data into *.hdf5.
+This script is used to compress the training dataset from *.mat data into *.hdf5.
 
 Created on Mon Dec  2 12:44:51 2019
 

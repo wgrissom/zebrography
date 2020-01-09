@@ -41,14 +41,14 @@ function [dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd)
     nproj = nY/delta_nY; %nproj = 1 actually in this study. 
     proj = zeros(nT,nX,nproj,nZ);
     for jj = 1:nZ
-        tmp = apaznew(:,round(size(apaznew,2)/2)-round(nT/2):round(size(apaznew,2)/2)+round(nT/2)-1,jj);
+        tmp = apaznew(:,round(size(apaznew,2)/2)-round(nT/2):round(size(apaznew,2)/2)+round(nT/2)-1,jj); 
         tmp_p = zeros(nT,nX,nY);
         for kk = 1:nT
-            tmp_p(kk,:,:,:) = squeeze(interp1(r,squeeze(tmp(:,kk,:)),d,'pchip',0));
+            tmp_p(kk,:,:,:) = squeeze(interp1(r,squeeze(tmp(:,kk,:)),d,'pchip',0)); % interpolate the simulated pressure fields to 3D using the symmetry of FUS beam  
         end
         for kk = 1:nproj
             pa = tmp_p(:,:,(kk-1)*delta_nY+1:kk*delta_nY,:);
-            proj(:,:,kk,jj) =squeeze(sum(pa(:,:,:)*dY,3));
+            proj(:,:,kk,jj) =squeeze(sum(pa(:,:,:)*dY,3)); % integrate the pressure field along line-of-sight (y) dimension. 
         end
     end
     proj = single(proj);
@@ -66,6 +66,7 @@ function [dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd)
             [dxp,dzp] = accum_d(pa,dX,dY,dZ,n);
             dx(:,:,kk,jj) = dxp;
             dz(:,:,kk,jj) = dzp;
+            % we divide the porjection step to small steps to calculate displacements. This is closer to reality that lights propagates thourgh water. 
         end
     end
     apaznew = single(apaznew);
@@ -83,6 +84,7 @@ function [dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd)
         cenXp = x0;
         for nn = 1:nproj
             dxp = interp2(z0,x0,squeeze(dx(kk,:,nn,:)),cenZp,cenXp,'cubic',0);
+            % After each step of projection, interpolation needs to be performed to calculate the displacements of pixels located in the orginial grids.
             dzp = interp2(z0,x0,squeeze(dz(kk,:,nn,:)),cenZp,cenXp,'cubic',0);
             dxx(kk,:,:,nn) = dxp;
             dzz(kk,:,:,nn) = dzp;

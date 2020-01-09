@@ -3,7 +3,7 @@ This script is modified based on 'generator.py' in the package keras_preprocessi
 
 See: https://github.com/keras-team/keras-preprocessing/blob/master/keras_preprocessing/image/image_data_generator.py
 
-Modified by Huiwen Luo, Vanderbilt Unversity, 2019
+Modified by Huiwen Luo, Vanderbilt University, 2019
 """
 
 

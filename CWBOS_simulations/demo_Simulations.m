@@ -26,9 +26,9 @@ Zd = 17.061e-2/2; % The distance between iPad screen and the middle of FUS beam.
 %[dxreal,dzreal] = forward_model_dxdz(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
 %proj = forward_model_proj(apaz_sv,dY,dZ,nX,nY,z_sv);
 [dxreal,dzreal,proj] = forward_model(apaz_sv,dX,dY,dZ,nX,nY,z_sv,Zd);
-save(['./data_eg/dataparams_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'dX','dY','dZ','nX','nZ','nY','p0','-v7.3');
+save(['dataparams_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'dX','dY','dZ','nX','nZ','nY','p0','-v7.3');
 %save(['pressure_',num2str(p0),'_',num2str(f_num),'.mat'],'apaznew','-v7.3');
-save(['./data_eg/displacement_',num2str(p0),'_',num2str(f_num),'.mat'],'dxreal','dzreal','-v7.3');
+save(['displacement_',num2str(p0),'_',num2str(f_num),'.mat'],'dxreal','dzreal','-v7.3');
 %% 
 % To make simulated histograms closer to the reality, the point spread
 % funtion needs to be calculated from the actual photo by the least-square
@@ -40,7 +40,7 @@ blocks = ones(nblock,nblock);
 PSF = fspecial('average',3);
 blocks((nblock-npin+2)/2:(nblock+npin)/2,(nblock-npin+2)/2:(nblock+npin)/2) = 0;
 block1 = blocks;
-load('./data_eg/seg.mat')%200mv_1_5.mat')
+load('seg.mat');
 block2 = seg.unblur(:,:,8,13:14);
 block2 = block2(:,:,:); % collapse third and fourth dimensions
 ft1 = fftshift(fftshift(fft2(block1),1),2);
@@ -73,7 +73,7 @@ blocks = ones(nblock,nblock);
 blocks((nblock-npin+2)/2:(nblock+npin)/2,(nblock-npin+2)/2:(nblock+npin)/2) = 0;
 f_num = 2;
 for pp = 1:nP0
-    load(['./data_eg/displacement_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
+    load(['displacement_',num2str(P0(pp)),'_',num2str(f_num),'.mat']);
     locx = round(dxreal/ds);
     locz = round(dzreal/ds);
     nX = size(locx,2);
@@ -106,13 +106,13 @@ for pp = 1:nP0
     his = permute(his(:,:,:),[3 1 2]);
     his = his(:,:);
 
-    save(['./data_eg/his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
+    save(['his_',num2str(P0(pp)),'_',num2str(f_num),'.mat'],'his','nx','nz');
 end
-%% Make a dictionary comprising of vectorized histograms and peform SVD on the dictionary.
+%% Make a dictionary comprising of vectorized histograms and perform SVD on the dictionary.
 
-%%Expand intial histograms to SVD space 
-%%Load simualted histograms and projected pressure and make the dictionary.
-P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simualtions. 
+%%Expand initial histograms to SVD space 
+%%Load simulated histograms and projected pressure and make the dictionary.
+P0 = 152500; %% we saved each simulated dataset by p0 (transmitter pressure) in simulations. 
 
 %For 1.16MHz H101 transducer, P0 = [325:150:3200]*100, f_num = [1,2]
 %For 2.25MHz transducer, P0 = [325:150:2800]*100, f_num = [1,2,3];

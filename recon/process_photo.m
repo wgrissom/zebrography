@@ -1,26 +1,24 @@
-%|demo to process actual photos acquired by BOS system
+%|Process the actual photos acquired in the experiments. 
 %|
 %|
-
 %%This is a simple simulated non-FUS histograms used for actual photo
-%%processing. Size of pins and spacing between pins were from the actual
+%%processing. Size of pins and spacing between pins were determined from the actual
 %%photo.
-nblock = 54; % Size of blocks, even number to be consistent with ipad and camera
+nblock = 54; % width of histograms, even number to be consistent with ipad and camera
 npin = 6;% pin: 1 pixel, spacing: 8 pixels
 blocks = ones(nblock,nblock);
 nhalf = 27;
 blocks((nblock-npin+2)/2:(nblock+npin)/2,(nblock-npin+2)/2:(nblock+npin)/2) = 0;
 
-photopath ='../recon/FUSphotos/200mV_0d'; % Path where the photos saved. The actual photos under the same condition
-% were usually saved in the same folder.
+photopath ='/200mv'; % Path where the photos saved.
 list1 = dir([photopath,'/*.CR2']);
 datapath = [photopath,'/data'];
 mkdir(datapath);
 
-repnum = 1; %number of repeated experiments under the same condition.
-circnum = 4; % 4x4 photos with equal-interval grid translation in x and z dimension.
+repnum = 1; %number of repeated photos.
+circnum = 4; % 4x4 photos with equal-interval grid translation in x- and z- dimension.
 
-order = reshape(1:circnum^2,circnum,circnum)'; % The order of photo acquition. This is z-direction first and then x-direction.
+order = reshape(1:circnum^2,circnum,circnum)'; % The order of photo acquisition. This is z-direction first and then x-direction.
 order = order(:);
 
 % x-direction first and then z-direction.
@@ -34,10 +32,10 @@ blur =double(rgb2gray(imread([photopath,'/',list1(2).name]))); %Load FUS photo, 
 
 gen_FOV = false;
 
-xxmin = 1479; xxmax = 2167; zzmin = 2292; zzmax = 3660; %An example of extracted FOV for 200mV_10d
+xxmin = 1479; xxmax = 2167; zzmin = 2292; zzmax = 3660; %An example of extracted FOV for 200mV
 
 
-%----------------------------------------------%
+%-----------------------------------------------------------%
 % Use 'roipoly' function to extract a rectangular FOV (pin-blurring region)
 % around the focus.
 if gen_FOV
@@ -48,8 +46,9 @@ if gen_FOV
     zzmax = max(zind(:)); zzmin = min(zind(:));
     close all;
 end
-%-----------------------------------------------%
-bkg = bkg(xxmin:xxmax,zzmin:zzmax); %Crop photo into extracted FOV. 
+%--------------------------------------------------------%
+
+bkg = bkg(xxmin:xxmax,zzmin:zzmax); %Crop the full FOV into extracted FOV. 
 blur = blur(xxmin:xxmax,zzmin:zzmax);
 
 
@@ -57,7 +56,8 @@ blur = blur(xxmin:xxmax,zzmin:zzmax);
 bkgtmp = filter2(fspecial('average',3),bkg/max(bkg(:)));
 bkgtmp = (bkgtmp-min(bkgtmp(:)))/(max(bkgtmp(:))-min(bkgtmp(:)));
 [N,X] = hist(bkgtmp(:));
-edges = filter2(fspecial('average',5),(bwmorph(bkgtmp>median(X),'shrink',inf) == 1))>0.1;
+edges = filter2(fspecial('average',5),(bwmorph(bkgtmp>median(X),'shrink',inf) == 1))>0.1;  
+%% smooth the original photo and use the Matlab function "bwmorph" to extract the edges of histograms.
 [m,n] = find(edges == 1);
 tbl1 = tabulate(m);
 tbl2 = tabulate(n);
@@ -66,15 +66,15 @@ thres2 = smoothdata(tbl2(:,2));
 thres1 = thres1/max(thres1(:));
 thres2 = thres2/max(thres2(:));
 [~,zz] = findpeaks(thres2,'MinPeakHeight',0.7);
-[~,xx] = findpeaks(thres1,'MinPeakHeight',0.7);
+[~,xx] = findpeaks(thres1,'MinPeakHeight',0.7);  % find the coordinates (x,z) of endpoints.
 diffzz = diff(zz(2:end-1));
 diffxx = diff(xx(2:end-1));
 nblock_p = round((mean(diffzz)+mean(diffxx))/2);
 if mod(nblock_p,2)~=0
-    nblock_p = nblock_p+1;
+    nblock_p = nblock_p+1; % This is the true width of simulated histograms. 
 end
-nxp = size(bkg,1);
-nzp = size(bkg,2);
+nxp = size(bkg,1); % the number of histograms in x-dimension
+nzp = size(bkg,2); % the number of histograms in z-dimension
 [x1,z1] = meshgrid(1:nzp,1:nxp);
 [x2,z2] = meshgrid(1:nblock_p/nblock:nzp,1:nblock_p/nblock:nxp);
 disp(['Actual size of histogram: ~',num2str(nblock_p),' pixels'])
@@ -89,7 +89,7 @@ for pn = 1:repnum*circnum^2 %Process circnum x circum photos with "repnum" repet
     
     bkg = double((imread([photopath,'/',list1(2*pn-1).name])));
     blur = double((imread([photopath,'/',list1(2*pn).name])));
-    %load FUS photo(blur) and its background photo (non-FUS) for
+    %load FUS photo(blur) and its background photo (bkg) for
     %segmentation.  
     %Note that here the transducer is on the right side of photo. 
     
@@ -97,7 +97,7 @@ for pn = 1:repnum*circnum^2 %Process circnum x circum photos with "repnum" repet
     xoffset = round(mod(ss,circnum)*dpixel); 
     zoffset = round(floor(ss/circnum)*dpixel);
     
-    %Take out the green chanel of RGB photo, move the rectangular FOV by xoffset pixels and zoffset pixels following the photos'
+    %Take out the green channel of RGB photo, move the rectangular FOV by xoffset pixels and zoffset pixels following the photos'
     %grid translations, and crop the photo into the smaller rectangular
     %photo.
     bkg = (bkg(xxmin+xoffset:xxmax+xoffset,zzmin+zoffset:zzmax+zoffset,2));
@@ -202,7 +202,7 @@ for  ff = 1:repnum
     nZ = size(tilehisblur,4);
     tilehisblur = single(tilehisblur);
     tilehisunblur = single(tilehisunblur);
-    save([datapath,'/tilehis',num2str(ff)],'tilehisblur','tilehisunblur','nX','nZ');
+    save([datapath,'/tilehis',num2str(ff)],'tilehisblur','tilehisunblur','nX','nZ'); % tilehis*.mat will finally be brought into the input of the neural network.
 end
 
 
