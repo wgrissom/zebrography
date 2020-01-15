@@ -29,10 +29,8 @@ These instructions will get you a copy of the project up and running on your loc
 2. Connect an Arduino Board to the external port of waveform generator and the analog switch that is connected to the wired switch (see the shutter design in "/CWBOS_acquisition/modified_camera_shutter_design.zip").
 3. Connect the wave generator to the amplifier, and connect the amplifier to the focused-ultrasound transducer. Connect the DSLR camera to the experimental computer via USB and open the software to control the camera remotely (e.g.: EOS Utility Software for Canon DSLR camera). 
 4. Compile the code "/CWBOS_acquisition/ShutterController_Arduino.ino" on the Arduino board. 
-<<<<<<< HEAD
 5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the APP in mind!
 6. Change the IP address in the "/CWBOS_acquisition/testacq.m' and set other parameters in the script.
-=======
 5. Run "BOSTomoDisplay_app_iPad.py" on the Pythonista installed on the iPad,  and keep the IP address shown on the APP in mind!
 6. Change the IP address in the "/CWBOS_acquistion/testacq.m' and set other parameters in the script.
 7. Set the parameters of waveform generator and the camera parameters.
@@ -144,7 +142,7 @@ end
 
 ```Matlab
 P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simulations. 
-=======
+
 5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrix "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
 
 ```Matlab
