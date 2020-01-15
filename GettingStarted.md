@@ -141,11 +141,6 @@ end
 5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrix "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
 
 ```Matlab
-P0 = 152500; %% we saved each simulated dataset by p0(transmitter pressure) in simulations. 
-
-5. Concatenate histograms, perform the singular value decomposition (SVD) and save projection matrix "V_red". A simple example only including data of p0 = 152500 and f_num = 2 is stored in "dict.mat".
-
-```Matlab
 P0 = 152500; %% we saved each simulated dataset by p0 (transmitter pressure) in simulations. 
 
 nP0 = length(P0);
