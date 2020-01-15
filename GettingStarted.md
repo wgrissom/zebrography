@@ -89,7 +89,6 @@ fits1 = (ifft2((fits(:,:,1))));
 ```
 
 4. Generate simulated histograms. Simulated histograms of p0 = 152500 and f_num = 2 are given in "his_152500_2.mat".
-
 ```Matlab
 ds = 25.4/264*1e-3*1668/834/8; %% width of each pixel
 P0 = 152500;
@@ -142,7 +141,6 @@ end
 
 ```Matlab
 P0 = 152500; %% we saved each simulated dataset by p0 (transmitter pressure) in simulations. 
-
 nP0 = length(P0);
 hisdic = [];
 rmsproj = [];
